@@ -1,0 +1,82 @@
+import 'package:cactus_hr/core/core.dart';
+import 'package:cactus_hr/features/features.dart';
+import 'package:cactus_hr/utils/utils.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:oktoast/oktoast.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+
+class LzyctApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
+    );
+
+    log.d(const String.fromEnvironment('ENV'));
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => sl<SettingsCubit>()..loadSettings()),
+        BlocProvider(create: (_) => sl<AuthCubit>()),
+        BlocProvider(create: (_) => sl<LogoutCubit>()),
+      ],
+      child: OKToast(
+        child: ScreenUtilInit(
+          /// Set screen size to make responsive
+          /// Almost all device
+          designSize: const Size(375, 667),
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (context, _) {
+            /// Pass context to appRoute
+            AppRoute.setStream(context);
+
+            return BlocBuilder<SettingsCubit, SettingsState>(
+              builder: (_, state) {
+                final data = switch (state) {
+                  SettingsStateSuccess(:final data) => data,
+                  SettingsStateLoading() || SettingsStateFailure() => const DataHelper(
+                    type: 'en',
+                    activeTheme: ActiveTheme.system,
+                  ),
+                };
+                return MaterialApp.router(
+                  routerConfig: AppRoute.router,
+                  localizationsDelegates: const [
+                    Strings.delegate,
+                    ...GlobalMaterialLocalizations.delegates,
+                  ],
+                  debugShowCheckedModeBanner: false,
+                  builder: (BuildContext context, Widget? child) {
+                    final MediaQueryData data = MediaQuery.of(context);
+
+                    return SkeletonizerConfig(
+                      data: skeletonConfig(context),
+                      child: MediaQuery(
+                        data: data.copyWith(
+                          textScaler: TextScaler.noScaling,
+                          alwaysUse24HourFormat: true,
+                        ),
+                        child: child!,
+                      ),
+                    );
+                  },
+                  title: Constants.appName,
+                  theme: themeLight(context),
+                  darkTheme: themeDark(context),
+                  locale: Locale(data.type ?? 'en'),
+                  supportedLocales: L10n.all,
+                  themeMode: data.activeTheme.mode,
+                  themeAnimationDuration: Motion.slow,
+                  themeAnimationCurve: Motion.standard,
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+}

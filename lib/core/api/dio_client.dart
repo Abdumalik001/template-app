@@ -1,0 +1,139 @@
+import 'package:cactus_hr/core/core.dart';
+import 'package:cactus_hr/utils/utils.dart';
+import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
+
+typedef ResponseConverter<T> = T Function(dynamic response);
+
+class DioClient with MainBoxMixin, FirebaseCrashLogger {
+  final String baseUrl;
+
+  String? _token;
+  bool _isUnitTest = false;
+  late Dio _dio;
+
+  DioClient({bool isUnitTest = false, String? baseUrl})
+    : baseUrl = baseUrl ?? const String.fromEnvironment('BASE_URL') {
+    _isUnitTest = isUnitTest;
+
+    try {
+      _token = token();
+    } catch (_) {}
+
+    _dio = _createDio();
+
+    if (!_isUnitTest) {
+      _dio.interceptors.add(DioInterceptor());
+    }
+  }
+
+  String token() => getData(MainBoxKeys.authToken) ?? getData(MainBoxKeys.generalToken);
+
+  Dio get dio {
+    if (_isUnitTest) {
+      /// Return static dio if is unit test
+      return _dio;
+    } else {
+      /// We need to recreate dio to avoid token issue after login
+      try {
+        _token = token();
+      } catch (_) {}
+
+      final dio = _createDio();
+
+      if (!_isUnitTest) {
+        dio.interceptors.add(DioInterceptor());
+      }
+
+      return dio;
+    }
+  }
+
+  Dio _createDio() => Dio(
+    BaseOptions(
+      baseUrl: baseUrl,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        if (_token != null) ...{'Authorization': _token},
+      },
+      receiveTimeout: const Duration(minutes: 1),
+      connectTimeout: const Duration(minutes: 1),
+      validateStatus: (int? status) => status! > 0,
+    ),
+  );
+
+  Future<Either<Failure, T>> getRequest<T>(
+    String url, {
+    required ResponseConverter<T> converter,
+    Map<String, dynamic>? queryParameters,
+    bool isIsolate = true,
+    bool includeAuthorization = true,
+  }) async {
+    try {
+      final requestDio = dio;
+      if (!includeAuthorization) {
+        requestDio.options.headers.remove('Authorization');
+      }
+      final response = await requestDio.get(url, queryParameters: queryParameters);
+      if ((response.statusCode ?? 0) < 200 || (response.statusCode ?? 0) > 201) {
+        throw DioException(requestOptions: response.requestOptions, response: response);
+      }
+
+      if (!isIsolate) {
+        return Right(converter(response.data));
+      }
+      final isolateParse = IsolateParser<T>(response.data as Map<String, dynamic>, converter);
+      final result = await isolateParse.parseInBackground();
+      return Right(result);
+    } on DioException catch (e, stackTrace) {
+      try {
+        if (!_isUnitTest) {
+          nonFatalError(error: e, stackTrace: stackTrace);
+        }
+        return Left(
+          ServerFailure(e.response?.data['diagnostic']['message'] as String? ?? e.message),
+        );
+      } catch (e) {
+        return Left(ServerFailure(e.toString()));
+      }
+    }
+  }
+
+  Future<Either<Failure, T>> postRequest<T>(
+    String url, {
+    required ResponseConverter<T> converter,
+    Map<String, dynamic>? data,
+    bool isIsolate = true,
+    bool includeAuthorization = true,
+  }) async {
+    try {
+      final requestDio = dio;
+      if (!includeAuthorization) {
+        requestDio.options.headers.remove('Authorization');
+      }
+      final response = await requestDio.post(url, data: data);
+      if ((response.statusCode ?? 0) < 200 || (response.statusCode ?? 0) > 201) {
+        throw DioException(requestOptions: response.requestOptions, response: response);
+      }
+
+      if (!isIsolate) {
+        return Right(converter(response.data));
+      }
+      final isolateParse = IsolateParser<T>(response.data as Map<String, dynamic>, converter);
+      final result = await isolateParse.parseInBackground();
+      return Right(result);
+    } on DioException catch (e, stackTrace) {
+      try {
+        if (!_isUnitTest) {
+          nonFatalError(error: e, stackTrace: stackTrace);
+        }
+        return Left(
+          ServerFailure(e.response?.data['diagnostic']['message'] as String? ?? e.message),
+        );
+      } catch (e) {
+        return Left(ServerFailure(e.toString()));
+      }
+    }
+  }
+}

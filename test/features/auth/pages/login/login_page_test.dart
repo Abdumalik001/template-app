@@ -1,0 +1,277 @@
+import 'dart:io';
+
+import 'package:bloc_test/bloc_test.dart';
+import 'package:cactus_hr/core/core.dart';
+import 'package:cactus_hr/features/features.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:mocktail/mocktail.dart';
+
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+
+import '../../../../helpers/fake_path_provider_platform.dart';
+import '../../../../helpers/test_mock.mocks.dart';
+
+class MockAuthCubit extends MockCubit<AuthState> implements AuthCubit {}
+
+class FakeAuthCubit extends Fake implements AuthCubit {}
+
+void main() {
+  late AuthCubit authCubit;
+
+  bool obscureText(WidgetTester tester, Key key) => tester
+      .widget<EditableText>(
+        find.descendant(
+          of: find.byKey(key),
+          matching: find.byType(EditableText),
+        ),
+      )
+      .obscureText;
+
+  setUpAll(() {
+    HttpOverrides.global = null;
+    registerFallbackValue(FakeAuthCubit());
+    registerFallbackValue(const LoginParams());
+  });
+
+  setUp(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    PathProviderPlatform.instance = FakePathProvider();
+    await serviceLocator(isUnitTest: true, prefixBox: 'login_page_test_');
+    authCubit = MockAuthCubit();
+  });
+
+  Widget rootWidget(Widget body, {bool isDarkTheme = false}) =>
+      MultiBlocProvider(
+        providers: [BlocProvider<AuthCubit>.value(value: authCubit)],
+        child: ScreenUtilInit(
+          designSize: const Size(375, 667),
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (_, _) => MaterialApp(
+            localizationsDelegates: const [
+              Strings.delegate,
+              ...GlobalMaterialLocalizations.delegates,
+            ],
+            locale: const Locale('en'),
+            supportedLocales: L10n.all,
+            theme: isDarkTheme
+                ? themeDark(MockBuildContext())
+                : themeLight(MockBuildContext()),
+            home: body,
+          ),
+        ),
+      );
+
+  testWidgets('renders LoginPage for in Light and Dark Theme', (tester) async {
+    when(() => authCubit.state).thenReturn(const AuthState.success(null));
+
+    await tester.pumpWidget(rootWidget(const LoginPage()));
+    await tester.pumpAndSettle();
+    expect(
+      find.byWidgetPredicate((widget) {
+        if (widget is Image) {
+          return widget.image == const AssetImage(Images.icLogo) &&
+              widget.color == Palette.primary;
+        }
+        return false;
+      }),
+      findsOneWidget,
+    );
+
+    /// change theme to dark
+    await tester.pumpWidget(rootWidget(const LoginPage(), isDarkTheme: true));
+    await tester
+        .pumpAndSettle(); // Verify that the dark theme image is displayed
+    expect(
+      find.byWidgetPredicate((widget) {
+        if (widget is Image) {
+          return widget.image == const AssetImage(Images.icLogo) &&
+              widget.color == Palette.primaryDark;
+        }
+        return false;
+      }),
+      findsOneWidget,
+    );
+
+    /// the button should be disable
+    expect(tester.widget<Button>(find.byType(Button)).onPressed, null);
+  });
+  testWidgets('renders LoginPage for form validation blank', (tester) async {
+    when(() => authCubit.state).thenReturn(const AuthState.success(null));
+
+    await tester.pumpWidget(rootWidget(const LoginPage()));
+    await tester.pumpAndSettle();
+    await tester.dragUntilVisible(
+      find.byType(Button), // what you want to find
+      find.byType(SingleChildScrollView), // widget you want to scroll
+      const Offset(0, 50), // delta to move
+    );
+
+    /// the button should be disable
+    expect(tester.widget<Button>(find.byType(Button)).onPressed, null);
+  });
+
+  testWidgets('toggles password visibility', (tester) async {
+    when(() => authCubit.state).thenReturn(const AuthState.success(null));
+
+    await tester.pumpWidget(rootWidget(const LoginPage()));
+    await tester.pumpAndSettle();
+
+    expect(obscureText(tester, const Key('password')), isTrue);
+
+    await tester.ensureVisible(find.byKey(const Key('password')));
+    await tester.pump();
+    await tester.tap(
+      find.descendant(
+        of: find.byKey(const Key('password')),
+        matching: find.byType(IconButton),
+      ),
+    );
+    await tester.pump();
+
+    expect(obscureText(tester, const Key('password')), isFalse);
+    expect(find.byIcon(Icons.visibility_outlined), findsOneWidget);
+  });
+
+  testWidgets('shows an error for an invalid email', (tester) async {
+    when(() => authCubit.state).thenReturn(const AuthState.success(null));
+
+    await tester.pumpWidget(rootWidget(const LoginPage()));
+    await tester.enterText(find.byKey(const Key('email')), 'invalid-email');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Email is not valid'), findsOneWidget);
+  });
+
+  testWidgets('renders LoginPage for form validation fill email', (
+    tester,
+  ) async {
+    const email = 'mudassir@lazycatlabs.com';
+
+    when(() => authCubit.state).thenReturn(const AuthState.success(null));
+    when(() => authCubit.login(any())).thenAnswer((_) async {});
+
+    await tester.pumpWidget(rootWidget(const LoginPage()));
+    await tester.pumpAndSettle();
+    await tester.dragUntilVisible(
+      find.byType(Button), // what you want to find
+      find.byType(SingleChildScrollView), // widget you want to scroll
+      const Offset(0, 50), // delta to move
+    );
+
+    /// validate email
+    await tester.enterText(find.byKey(const Key('email')), email);
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 450));
+    await tester.pumpWidget(rootWidget(const LoginPage()));
+    expect(find.text('Email is not valid'), findsNothing);
+
+    await tester.tap(find.byKey(const Key('password')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('email')));
+    await tester.pumpAndSettle();
+    expect(find.text('Password must be at least 6 characters'), findsOneWidget);
+
+    /// the button should be disable
+    expect(tester.widget<Button>(find.byType(Button)).onPressed, null);
+  });
+
+  testWidgets(
+    'renders LoginPage for form validation fill email,password and call login cubit',
+    (tester) async {
+      const email = 'mudassir@lazycatlabs.com';
+      const password = 'password';
+
+      when(() => authCubit.state).thenReturn(const AuthState.success(null));
+      when(() => authCubit.login(any())).thenAnswer((_) async {});
+
+      await tester.pumpWidget(rootWidget(const LoginPage()));
+      await tester.pumpAndSettle();
+
+      /// validate email
+      await tester.enterText(find.byKey(const Key('email')), email);
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 450));
+      await tester.pumpWidget(rootWidget(const LoginPage()));
+      expect(find.text('Email is not valid'), findsNothing);
+
+      /// validate password
+      await tester.enterText(find.byKey(const Key('password')), password);
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 450));
+      await tester.pumpWidget(rootWidget(const LoginPage()));
+      expect(find.text('Password must be at least 6 characters'), findsNothing);
+
+      /// the button should be enable
+      expect(
+        tester.widget<Button>(find.byType(Button)).onPressed,
+        isA<VoidCallback>(),
+      );
+
+      // scroll down to make button visible
+      await tester.drag(
+        find.byType(SingleChildScrollView),
+        const Offset(0, -250),
+      );
+
+      await tester.pump(const Duration(milliseconds: 450));
+      await tester.tap(find.byType(Button));
+
+      /// verify if authCubit.login is called
+      verify(() => authCubit.login(any())).called(1);
+    },
+  );
+
+  testWidgets('sign-up link opens the register page', (tester) async {
+    when(() => authCubit.state).thenReturn(const AuthState.success(null));
+
+    final router = GoRouter(
+      initialLocation: Routes.login.path,
+      routes: [
+        GoRoute(
+          path: Routes.login.path,
+          name: Routes.login.name,
+          builder: (_, _) => const LoginPage(),
+        ),
+        GoRoute(
+          path: Routes.register.path,
+          name: Routes.register.name,
+          builder: (_, _) => const Text('Register route'),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      BlocProvider<AuthCubit>.value(
+        value: authCubit,
+        child: ScreenUtilInit(
+          designSize: const Size(375, 667),
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (_, _) => MaterialApp.router(
+            localizationsDelegates: const [
+              Strings.delegate,
+              ...GlobalMaterialLocalizations.delegates,
+            ],
+            locale: const Locale('en'),
+            supportedLocales: L10n.all,
+            theme: themeLight(MockBuildContext()),
+            routerConfig: router,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.byType(ButtonText));
+    await tester.tap(find.byType(ButtonText));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Register route'), findsOneWidget);
+  });
+}

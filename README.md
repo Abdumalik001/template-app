@@ -1,0 +1,157 @@
+<a href="https://s.id/standwithpalestine"><img alt="We stand with Palestine" src="https://cdn.jsdelivr.net/gh/Safouene1/support-palestine-banner@master/banner-project.svg" width="100%" /></a>
+
+<br>
+
+# Flutter App Auth 📱
+
+[![codecov](https://codecov.io/gh/lazycatlabs/cactus_hr/main/graph/badge.svg)](https://codecov.io/gh/lazycatlabs/cactus_hr)
+<br/><br/>
+<a href="https://www.linkedin.com/in/lzyct/" target="_blank">
+<img src="https://github.com/ukieTux/ukieTux/blob/master/assets/linkedin.svg" alt="LinkedIn" style="vertical-align:top; margin:4px" height=24>
+</a>
+<a href = "https://www.upwork.com/freelancers/~01913209d41be922f1?viewMode=1">
+<img src="https://img.shields.io/badge/UpWork-6FDA44?logo=Upwork&logoColor=white" height=24/>
+</a>
+
+This app has Auth Functions like Login, Register, and Show pagination data.
+
+Authentication uses [LazyAuth](https://lazyauth.lazycatlabs.com/), while the
+paginated Dashboard user list uses [DummyJSON](https://dummyjson.com/docs/users).
+
+<br>This app also implementing **Flutter Clean Architecture with TDD.**
+
+
+
+<p align="center">
+  <img src="maestro-recordings/stg/demo.gif" alt="Flutter Auth App demo: login, dashboard, settings, logout and register" width="300">
+</p>
+
+<p align="center"><sub>Recorded from the Maestro E2E run (<code>maestro-stg/main.yaml</code>) on iPhone 18 Pro Max, iOS 27 · <a href="maestro-recordings/stg/demo.mp4">MP4 version</a></sub></p>
+
+
+
+## Pre-requisites 📐
+
+| Technology | Recommended Version | Installation Guide                                                    |
+|------------|---------------------|-----------------------------------------------------------------------|
+| Flutter    | v3.47.x             | [Flutter Official Docs](https://flutter.dev/docs/get-started/install) |
+| Dart       | v3.13.x             | Installed automatically with Flutter                                  |
+
+## Get Started 🚀
+
+- Clone this project
+
+```bash 
+  flutter pub get 
+```
+
+- Run to generate localization files
+
+```bash
+flutter gen-l10n
+```
+
+- Run to generate freezes files
+
+```bash
+flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+- Run for **staging** or
+
+```bash
+flutter run --flavor stg -t lib/main.dart --dart-define-from-file .env.stg.json 
+```
+
+- Run for **production**
+
+```bash
+flutter run --flavor prd -t lib/main.dart --dart-define-from-file .env.prd.json 
+```
+
+- Test Coverage, we ignore some folders and files which is not necessary to test coverage because it are generated file
+- Note: on macOS, you need to have lcov installed on your system (`brew install lcov`) to use this:
+
+```bash
+ flutter test -j8 --coverage;lcov --remove coverage/lcov.info 'lib/core/localization/generated/' 'lib/core/resources/*' 'lib/utils/services/firebase/*' '**/*.g.dart' -o coverage/new_lcov.info ;genhtml coverage/new_lcov.info -o coverage/html
+````
+
+- To generate a launcher icon based on Flavor
+
+```bash
+dart run flutter_launcher_icons 
+```
+
+- To generate native splash screen
+
+```bash
+dart run flutter_native_splash:create --flavors stg,prd
+```
+
+- To generate mock class
+
+```bash
+dart pub run build_runner build
+```
+
+## Feature ✅
+
+- [x] BLoC State Management
+- [x] **Clean Architecture with TDD**
+    - [x] Unit Test
+    - [x] Widget Test
+    - [x] BLoC test
+- [x] Theme Configuration: `System, Light, Dark`
+- [x] Multi-Language: `English, Bahasa`
+- [x] Login, Register Example
+- [x] Pagination Example
+- [x] [Autofill Username and Password](https://github.com/lazycatlabs/cactus_hr/pull/3)
+- [x] Integration Test
+- [x] Implement multi-flavor
+- [x] Auto routing based on login status
+- [x] Implement [Go Router](https://pub.dev/packages/go_router)
+- [x] Burgundy minimalist theme with [Instrument Sans](https://github.com/Instrument/instrument-sans), animated transitions and [Skeletonizer](https://pub.dev/packages/skeletonizer) loading
+
+## TODO 📝
+
+- [ ] Login with Biometric / FaceID
+
+## Maestro Test 🧪
+
+- Install Maestro on your machine [Maestro](https://maestro.mobile.dev/getting-started/installing-maestro)
+- Run this command to run the test
+  ```bash
+   maestro test maestro-stg/main.yaml #or
+   maestro test maestro-prd/main.yaml
+  ```
+
+## Architecture Proposal by [Resocoder](https://github.com/ResoCoder/flutter-tdd-clean-architecture-course)
+
+<br>
+
+![architecture-proposal](./architecture-proposal.png)
+
+## 💡Tips
+
+- **Flutter native splashscreen:** The brand image in Android > 12 the frame size is 5:2, if the width is 500px, the height should be 500/2,5 = 200px
+
+## 📜 GNU General Public License v3.0
+
+<br><br>
+
+<h3 align="center">Buy me coffee if you love my works ☕️</h3>
+<p align="center">
+  <a href="https://www.buymeacoffee.com/Lzyct" target="_blank">
+    <img src="https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-2.svg" alt="buymeacoffe" style="vertical-align:top; margin:8px" height="36">
+  </a>&nbsp;&nbsp;&nbsp;&nbsp;
+   <a href="https://ko-fi.com/Lzyct" target="_blank">
+    <img src="https://cdn.prod.website-files.com/5c14e387dab576fe667689cf/670f5a01cf2da94a032117b9_support_me_on_kofi_red-p-500.png" alt="ko-fi" style="vertical-align:top; margin:8px" height="36">
+  </a>&nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="https://paypal.me/ukieTux" target="_blank">
+    <img src="https://blog.zoom.us/wp-content/uploads/2019/08/paypal.png" alt="paypal" style="vertical-align:top; margin:8px" height="36">
+  </a>
+  <a href="https://saweria.co/Lzyct" target="_blank">
+   <img src="https://1.bp.blogspot.com/-7OuHSxaNk6A/X92QPg8L9kI/AAAAAAAAG0E/lUzKf_uuVP8jCqvXpA7juh_l-TfK2jnbwCLcBGAsYHQ/s16000/SAWERIA.webp" style="vertical-align:top; margin:8px" height="36" alt="saweria">
+  </a>
+</p>
+<br><br>
