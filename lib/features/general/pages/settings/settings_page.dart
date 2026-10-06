@@ -49,7 +49,13 @@ class _SettingsPageState extends State<SettingsPage> {
           Icons.arrow_back_ios_new_rounded,
           size: Dimens.space20,
         ),
-        onPressed: () => context.pop(),
+        onPressed: () {
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.goNamed(Routes.dashboard.name);
+          }
+        },
       ),
     ),
     child: SingleChildScrollView(

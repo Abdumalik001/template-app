@@ -106,7 +106,11 @@ class MenuDrawer extends StatelessWidget {
     Navigator.of(context).pop(); // Close drawer
 
     if (item.route != null) {
-      context.goNamed(item.route!.name);
+      if (item.route == Routes.dashboard) {
+        context.goNamed(item.route!.name);
+      } else {
+        context.pushNamed(item.route!.name);
+      }
     } else if (item == AppMenuItem.logout) {
       _showLogoutDialog(context);
     }
