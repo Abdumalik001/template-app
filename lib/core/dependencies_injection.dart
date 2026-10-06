@@ -8,6 +8,7 @@ final GetIt sl = GetIt.instance;
 Future<void> serviceLocator({
   bool isUnitTest = false,
   bool isHiveEnable = true,
+  bool useFakeData = true,
   String prefixBox = '',
 }) async {
   if (isUnitTest) {
@@ -21,7 +22,7 @@ Future<void> serviceLocator({
   sl
     ..registerSingleton<DioClient>(DioClient(isUnitTest: isUnitTest))
     ..registerSingleton<DioClientDummyJson>(DioClientDummyJson(isUnitTest: isUnitTest));
-  _dataSources();
+  _dataSources(useFakeData: useFakeData);
   _repositories();
   _useCases();
   _cubits();
@@ -38,9 +39,14 @@ void _repositories() {
   sl.registerLazySingleton<UsersRepository>(() => UsersRepositoryImpl(sl()));
 }
 
-void _dataSources() {
-  sl.registerLazySingleton<AuthRemoteDatasource>(() => AuthRemoteDatasourceImpl(sl()));
-  sl.registerLazySingleton<UsersRemoteDatasource>(() => UsersRemoteDatasourceImpl(sl(), sl()));
+void _dataSources({bool useFakeData = true}) {
+  if (useFakeData) {
+    sl.registerLazySingleton<AuthRemoteDatasource>(AuthFakeDatasource.new);
+    sl.registerLazySingleton<UsersRemoteDatasource>(UsersFakeDatasource.new);
+  } else {
+    sl.registerLazySingleton<AuthRemoteDatasource>(() => AuthRemoteDatasourceImpl(sl()));
+    sl.registerLazySingleton<UsersRemoteDatasource>(() => UsersRemoteDatasourceImpl(sl(), sl()));
+  }
 }
 
 void _useCases() {
