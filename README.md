@@ -42,12 +42,24 @@ fvm dart run build_runner build --delete-conflicting-outputs
 
 - **Staging:**
 ```bash
-fvm flutter run --flavor stg --target lib/main.dart
+fvm flutter run --flavor stg --target lib/main.dart --dart-define-from-file .env.stg.json
 ```
 
 - **Production:**
 ```bash
-fvm flutter run --flavor prd --target lib/main.dart
+fvm flutter run --flavor prd --target lib/main.dart --dart-define-from-file .env.prd.json
+```
+
+5. Build the app:
+
+- **Staging APK:**
+```bash
+fvm flutter build apk --flavor stg --target lib/main.dart --dart-define-from-file .env.stg.json
+```
+
+- **Production APK:**
+```bash
+fvm flutter build apk --flavor prd --target lib/main.dart --dart-define-from-file .env.prd.json
 ```
 
 ## Quality Assurance & Verification 🔍
@@ -55,4 +67,9 @@ fvm flutter run --flavor prd --target lib/main.dart
 Run static analysis:
 ```bash
 fvm flutter analyze
+```
+
+Run tests:
+```bash
+fvm flutter test
 ```

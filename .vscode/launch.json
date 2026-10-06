@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Cactus HR (Staging)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--flavor",
+        "stg",
+        "--dart-define-from-file",
+        ".env.stg.json"
+      ]
+    },
+    {
+      "name": "Cactus HR (Production)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--flavor",
+        "prd",
+        "--dart-define-from-file",
+        ".env.prd.json"
+      ]
+    }
+  ]
+}
