@@ -37,16 +37,7 @@ class AppRoute {
       GoRoute(
         path: Routes.splashScreen.path,
         name: Routes.splashScreen.name,
-        builder: (_, _) => BlocProvider(
-          create: (_) => sl<GeneralTokenCubit>()
-            ..generalToken(
-              const GeneralTokenParams(
-                clientId: String.fromEnvironment('CLIENT_ID'),
-                clientSecret: String.fromEnvironment('CLIENT_SECRET'),
-              ),
-            ),
-          child: const SplashScreenPage(),
-        ),
+        builder: (_, _) => const SplashScreenPage(),
       ),
       GoRoute(
         path: Routes.root.path,
@@ -105,18 +96,19 @@ class AppRoute {
           state.matchedLocation == Routes.register.path ||
           state.matchedLocation == Routes.splashScreen.path;
 
+      final bool isLoggedIn = sl.isRegistered<AppStorageContract>() &&
+          (sl<AppStorageContract>().getPref<bool>(PrefKey.isLogin) ?? false);
+
       ///  Check if not login
       ///  if current page is login page we don't need to direct user
       ///  but if not we must direct user to login page
-      if (!((MainBoxMixin.mainBox?.get(MainBoxKeys.isLogin.name) as bool?) ?? false)) {
+      if (!isLoggedIn) {
         return isAllowedPages ? null : Routes.login.path; //coverage:ignore-line
       }
 
       /// Check if already login and in login page
       /// we should direct user to main page
-
-      if (isAllowedPages &&
-          ((MainBoxMixin.mainBox?.get(MainBoxKeys.isLogin.name) as bool?) ?? false)) {
+      if (isAllowedPages && isLoggedIn) {
         return Routes.root.path;
       }
 

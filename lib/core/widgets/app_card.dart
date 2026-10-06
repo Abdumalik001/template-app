@@ -1,8 +1,8 @@
 import 'package:cactus_hr/core/core.dart';
 import 'package:material_ui/material_ui.dart';
 
-class LzyctCard extends StatelessWidget {
-  const LzyctCard({required this.child, super.key, this.onTap});
+class AppCard extends StatelessWidget {
+  const AppCard({required this.child, super.key, this.onTap});
 
   final Widget child;
   final VoidCallback? onTap;

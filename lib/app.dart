@@ -8,7 +8,9 @@ import 'package:material_ui/material_ui.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class LzyctApp extends StatelessWidget {
+class App extends StatelessWidget {
+  const App({super.key});
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(

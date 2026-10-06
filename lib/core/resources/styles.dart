@@ -39,7 +39,7 @@ ThemeData themeLight(BuildContext context) => _buildTheme(
     outlineVariant: Palette.outline,
     shadow: Palette.shadow,
   ),
-  colors: const LzyctColors(
+  colors: const AppColors(
     background: Palette.background,
     surface: Palette.surface,
     surfaceVariant: Palette.surfaceVariant,
@@ -94,7 +94,7 @@ ThemeData themeDark(BuildContext context) => _buildTheme(
     outlineVariant: Palette.outlineDark,
     shadow: Palette.shadowDark,
   ),
-  colors: const LzyctColors(
+  colors: const AppColors(
     background: Palette.backgroundDark,
     surface: Palette.surfaceDark,
     surfaceVariant: Palette.surfaceVariantDark,
@@ -119,7 +119,7 @@ ThemeData themeDark(BuildContext context) => _buildTheme(
 ThemeData _buildTheme({
   required Brightness brightness,
   required ColorScheme colorScheme,
-  required LzyctColors colors,
+  required AppColors colors,
   required Color cardColor,
   required SystemUiOverlayStyle overlayStyle,
 }) {
@@ -301,7 +301,7 @@ TextTheme _textTheme(Color color) {
   );
 }
 
-class LzyctColors extends ThemeExtension<LzyctColors> {
+class AppColors extends ThemeExtension<AppColors> {
   final Color? background;
   final Color? surface;
   final Color? surfaceVariant;
@@ -319,7 +319,7 @@ class LzyctColors extends ThemeExtension<LzyctColors> {
   final Color? shadow;
   final Color? warning;
 
-  const LzyctColors({
+  const AppColors({
     this.background,
     this.surface,
     this.surfaceVariant,
@@ -339,7 +339,7 @@ class LzyctColors extends ThemeExtension<LzyctColors> {
   });
 
   @override
-  ThemeExtension<LzyctColors> copyWith({
+  ThemeExtension<AppColors> copyWith({
     Color? background,
     Color? surface,
     Color? surfaceVariant,
@@ -356,7 +356,7 @@ class LzyctColors extends ThemeExtension<LzyctColors> {
     Color? textWarning,
     Color? shadow,
     Color? warning,
-  }) => LzyctColors(
+  }) => AppColors(
     background: background ?? this.background,
     surface: surface ?? this.surface,
     surfaceVariant: surfaceVariant ?? this.surfaceVariant,
@@ -376,14 +376,14 @@ class LzyctColors extends ThemeExtension<LzyctColors> {
   );
 
   @override
-  ThemeExtension<LzyctColors> lerp(
-    covariant ThemeExtension<LzyctColors>? other,
+  ThemeExtension<AppColors> lerp(
+    covariant ThemeExtension<AppColors>? other,
     double t,
   ) {
-    if (other is! LzyctColors) {
+    if (other is! AppColors) {
       return this;
     }
-    return LzyctColors(
+    return AppColors(
       background: Color.lerp(background, other.background, t),
       surface: Color.lerp(surface, other.surface, t),
       surfaceVariant: Color.lerp(surfaceVariant, other.surfaceVariant, t),

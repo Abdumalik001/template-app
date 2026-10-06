@@ -1,7 +1,7 @@
 import 'dart:async';
 
+import 'package:cactus_hr/app.dart';
 import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/lzyct_app.dart';
 import 'package:cactus_hr/utils/utils.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/services.dart';
@@ -20,9 +20,8 @@ void main() {
       return await SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
         DeviceOrientation.portraitDown,
-      ]).then((_) => runApp(LzyctApp()));
+      ]).then((_) => runApp(const App()));
     },
-    (error, stackTrace) =>
-        FirebaseCrashlytics.instance.recordError(error, stackTrace),
+    (error, stackTrace) => FirebaseCrashlytics.instance.recordError(error, stackTrace),
   );
 }

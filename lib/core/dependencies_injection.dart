@@ -15,23 +15,22 @@ Future<void> serviceLocator({
   }
 
   if (isHiveEnable) {
-    await _initHiveBoxes(prefixBox: prefixBox);
+    await _initAppStorage(prefixBox: prefixBox);
   }
 
   sl
     ..registerSingleton<DioClient>(DioClient(isUnitTest: isUnitTest))
-    ..registerSingleton<DioClientDummyJson>(
-      DioClientDummyJson(isUnitTest: isUnitTest),
-    );
+    ..registerSingleton<DioClientDummyJson>(DioClientDummyJson(isUnitTest: isUnitTest));
   _dataSources();
   _repositories();
   _useCases();
   _cubits();
 }
 
-Future<void> _initHiveBoxes({String prefixBox = ''}) async {
-  await MainBoxMixin.initHive(prefixBox);
-  sl.registerSingleton<MainBoxMixin>(MainBoxMixin());
+Future<void> _initAppStorage({String prefixBox = ''}) async {
+  final appStorage = AppStorage();
+  await appStorage.init(prefixBox);
+  sl.registerSingleton<AppStorageContract>(appStorage);
 }
 
 void _repositories() {
@@ -40,12 +39,8 @@ void _repositories() {
 }
 
 void _dataSources() {
-  sl.registerLazySingleton<AuthRemoteDatasource>(
-    () => AuthRemoteDatasourceImpl(sl()),
-  );
-  sl.registerLazySingleton<UsersRemoteDatasource>(
-    () => UsersRemoteDatasourceImpl(sl(), sl()),
-  );
+  sl.registerLazySingleton<AuthRemoteDatasource>(() => AuthRemoteDatasourceImpl(sl()));
+  sl.registerLazySingleton<UsersRemoteDatasource>(() => UsersRemoteDatasourceImpl(sl(), sl()));
 }
 
 void _useCases() {
@@ -53,7 +48,6 @@ void _useCases() {
     ..registerLazySingleton(() => PostLogin(sl()))
     ..registerLazySingleton(() => PostLogout(sl()))
     ..registerLazySingleton(() => PostRegister(sl()))
-    ..registerLazySingleton(() => PostGeneralToken(sl()))
     ..registerLazySingleton(() => GetUsers(sl()))
     ..registerLazySingleton(() => GetUser(sl()));
 }
@@ -62,7 +56,6 @@ void _cubits() {
   sl
     ..registerFactory(() => RegisterCubit(sl()))
     ..registerFactory(() => AuthCubit(sl()))
-    ..registerFactory(() => GeneralTokenCubit(sl()))
     ..registerFactory(() => LogoutCubit(sl()))
     ..registerFactory(() => UserCubit(sl()))
     ..registerFactory(() => UsersCubit(sl()))

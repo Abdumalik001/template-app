@@ -2,4 +2,4 @@
 # Manual modifications may be necessary for certain migrations
 # Check in to version control
 nextTypeId: 0
-types: {}
+types: { }

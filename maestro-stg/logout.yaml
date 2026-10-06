@@ -1,8 +1,0 @@
-appId: com.lazycatlabs.auths.stg
----
-- tapOn: "Menu"
-- tapOn: "Logout"
-- tapOn: "Yes"
-- extendedWaitUntil:
-    visible: "Don't have an account.*"
-    timeout: 15000

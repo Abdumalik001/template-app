@@ -7,21 +7,26 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'post_login.freezed.dart';
 part 'post_login.g.dart';
 
-class PostLogin extends UseCase<Login, LoginParams> with MainBoxMixin {
+class PostLogin extends UseCase<Login, LoginParams> {
   final AuthRepository _repo;
+  final AppStorageContract _storage;
 
-  PostLogin(this._repo);
+  PostLogin(this._repo, [AppStorageContract? storage])
+      : _storage = storage ?? sl<AppStorageContract>();
 
   @override
   Future<Either<Failure, Login>> call(LoginParams params) async {
     final result = await _repo.login(params);
-    return result.fold<Either<Failure, Login>>((failure) => Left(failure),
-        (login) {
-      addData(MainBoxKeys.isLogin, true);
-      addData(MainBoxKeys.authToken, login.token);
-      addData(MainBoxKeys.refreshToken, login.refreshToken);
-      return Right(login);
-    });
+    return await result.fold<Future<Either<Failure, Login>>>(
+      (failure) async => Left(failure),
+      (login) async {
+        await _storage.saveTokens(
+          access: login.token ?? '',
+          refresh: login.refreshToken ?? '',
+        );
+        return Right(login);
+      },
+    );
   }
 }
 

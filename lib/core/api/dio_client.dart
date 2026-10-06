@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 
 typedef ResponseConverter<T> = T Function(dynamic response);
 
-class DioClient with MainBoxMixin, FirebaseCrashLogger {
+class DioClient with FirebaseCrashLogger {
   final String baseUrl;
 
   String? _token;
@@ -27,7 +27,16 @@ class DioClient with MainBoxMixin, FirebaseCrashLogger {
     }
   }
 
-  String token() => getData(MainBoxKeys.authToken) ?? getData(MainBoxKeys.generalToken);
+  String token() {
+    if (sl.isRegistered<AppStorageContract>()) {
+      final storage = sl<AppStorageContract>();
+      final cachedToken = storage.token;
+      if (cachedToken != null && cachedToken.isNotEmpty) {
+        return cachedToken;
+      }
+    }
+    return '';
+  }
 
   Dio get dio {
     if (_isUnitTest) {

@@ -39,26 +39,6 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, GeneralToken>> generalToken(
-    GeneralTokenParams params,
-  ) async {
-    final response = await authRemoteDatasource.generalToken(params);
-
-    return response.fold<Either<Failure, GeneralToken>>((failure) => Left(failure),
-        (tokenResponse) {
-      if (tokenResponse.data == null) {
-        return Left(NoDataFailure());
-      }
-      return Right(
-        GeneralToken(
-          token:
-              '${tokenResponse.data?.tokenType} ${tokenResponse.data?.token}',
-        ),
-      );
-    });
-  }
-
-  @override
   Future<Either<Failure, String>> logout() async {
     final response = await authRemoteDatasource.logout();
 

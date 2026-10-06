@@ -22,7 +22,7 @@ class _DashboardUserItem extends StatelessWidget {
       duration: index == null ? Duration.zero : Motion.slow,
       child: Padding(
         padding: EdgeInsets.only(bottom: Dimens.space12),
-        child: LzyctCard(
+        child: AppCard(
           child: Padding(
             padding: EdgeInsets.all(Dimens.space12),
             child: Row(

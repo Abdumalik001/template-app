@@ -3,11 +3,13 @@ import 'package:cactus_hr/features/features.dart';
 import 'package:cactus_hr/utils/utils.dart';
 import 'package:dartz/dartz.dart';
 
-class PostLogout extends UseCase<String, NoParams> with MainBoxMixin {
+class PostLogout extends UseCase<String, NoParams> {
   final AuthRepository _repo;
+  final AppStorageContract _storage;
 
   // coverage:ignore-start
-  PostLogout(this._repo);
+  PostLogout(this._repo, [AppStorageContract? storage])
+      : _storage = storage ?? sl<AppStorageContract>();
 
   @override
   Future<Either<Failure, String>> call(NoParams _) async {
@@ -15,7 +17,7 @@ class PostLogout extends UseCase<String, NoParams> with MainBoxMixin {
     return await result.fold<Future<Either<Failure, String>>>(
       (failure) async => Left(failure),
       (message) async {
-        await logoutBox();
+        await _storage.clearSession();
         return Right(message);
       },
     );

@@ -8,17 +8,23 @@ import 'package:dio/dio.dart';
 import 'package:material_ui/material_ui.dart';
 
 // coverage:ignore-start
-class DioInterceptor extends Interceptor with FirebaseCrashLogger, MainBoxMixin {
+class DioInterceptor extends Interceptor with FirebaseCrashLogger {
   static const _skipRefreshKey = 'skipAuthRefresh';
   static Future<bool>? _activeRefresh;
 
   final Dio Function() _dioFactory;
   final Future<void> Function()? _onLogout;
   final String Function() _deviceInfo;
+  final AppStorageContract _storage;
 
-  DioInterceptor({Dio Function()? dioFactory, this._onLogout, String Function()? deviceInfo})
-    : _dioFactory = dioFactory ?? (() => DioClient().dio),
-      _deviceInfo = deviceInfo ?? (() => Platform.localHostname);
+  DioInterceptor({
+    Dio Function()? dioFactory,
+    this._onLogout,
+    String Function()? deviceInfo,
+    AppStorageContract? storage,
+  })  : _dioFactory = dioFactory ?? (() => DioClient().dio),
+        _deviceInfo = deviceInfo ?? (() => Platform.localHostname),
+        _storage = storage ?? sl<AppStorageContract>();
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
@@ -64,7 +70,7 @@ class DioInterceptor extends Interceptor with FirebaseCrashLogger, MainBoxMixin 
   }
 
   Future<Response<dynamic>> _retry(RequestOptions requestOptions) {
-    final authToken = _storedString(MainBoxKeys.authToken);
+    final authToken = _storage.token;
     final headers = Map<String, dynamic>.from(requestOptions.headers)
       ..removeWhere((key, _) => key.toLowerCase() == 'authorization');
     if (authToken != null) {
@@ -92,9 +98,8 @@ class DioInterceptor extends Interceptor with FirebaseCrashLogger, MainBoxMixin 
   }
 
   Future<bool> refreshToken() async {
-    final refreshToken = _storedString(MainBoxKeys.refreshToken);
-    final generalToken = _storedString(MainBoxKeys.generalToken);
-    if (refreshToken == null || generalToken == null) {
+    final refreshToken = await _storage.refreshToken;
+    if (refreshToken == null) {
       return false;
     }
 
@@ -104,11 +109,10 @@ class DioInterceptor extends Interceptor with FirebaseCrashLogger, MainBoxMixin 
         data: {
           'refreshToken': refreshToken,
           'deviceInfo': _deviceInfo(),
-          'fcmToken': _storedString(MainBoxKeys.fcm) ?? 'GeneratedFCMToken',
+          'fcmToken': _storage.fcm ?? 'GeneratedFCMToken',
           'loginType': 'email',
         },
         options: Options(
-          headers: {'Authorization': generalToken},
           extra: const {_skipRefreshKey: true},
         ),
       );
@@ -124,8 +128,10 @@ class DioInterceptor extends Interceptor with FirebaseCrashLogger, MainBoxMixin 
         return false;
       }
 
-      await addData(MainBoxKeys.refreshToken, '${data!.tokenType} ${data.refreshToken}');
-      await addData(MainBoxKeys.authToken, '${data.tokenType} ${data.token}');
+      await _storage.saveTokens(
+        access: '${data!.tokenType} ${data.token}',
+        refresh: '${data.tokenType} ${data.refreshToken}',
+      );
       return true;
     } catch (error, stackTrace) {
       nonFatalError(error: error, stackTrace: stackTrace);
@@ -162,10 +168,8 @@ class DioInterceptor extends Interceptor with FirebaseCrashLogger, MainBoxMixin 
         .firstOrNull
         ?.value
         .toString();
-    final generalToken = _storedString(MainBoxKeys.generalToken);
     return authorization != null &&
-        authorization != generalToken &&
-        (_storedString(MainBoxKeys.refreshToken)?.isNotEmpty ?? false);
+        (_storage.token?.isNotEmpty ?? false);
   }
 
   Future<bool> _refreshOnce() async {
@@ -185,15 +189,7 @@ class DioInterceptor extends Interceptor with FirebaseCrashLogger, MainBoxMixin 
     }
   }
 
-  String? _storedString(MainBoxKeys key) {
-    try {
-      return getData<String?>(key);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  Future<void> _logout() => _onLogout?.call() ?? logoutBox();
+  Future<void> _logout() => _onLogout?.call() ?? _storage.clearSession();
 
   Future<void> _handleUnauthorizedResponse(
     Response response,

@@ -7,10 +7,6 @@ abstract class AuthRemoteDatasource {
 
   Future<Either<Failure, LoginResponse>> login(LoginParams params);
 
-  Future<Either<Failure, GeneralTokenResponse>> generalToken(
-    GeneralTokenParams params,
-  );
-
   Future<Either<Failure, DiagnosticResponse>> logout();
 }
 
@@ -40,21 +36,6 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       data: params.toJson(),
       converter: (response) =>
           LoginResponse.fromJson(response as Map<String, dynamic>),
-    );
-
-    return response;
-  }
-
-  @override
-  Future<Either<Failure, GeneralTokenResponse>> generalToken(
-    GeneralTokenParams params,
-  ) async {
-    final response = await _client.postRequest(
-      ListAPI.generalToken,
-      data: params.toJson(),
-      converter: (response) =>
-          GeneralTokenResponse.fromJson(response as Map<String, dynamic>),
-      includeAuthorization: false,
     );
 
     return response;
