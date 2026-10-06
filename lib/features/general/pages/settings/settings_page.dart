@@ -26,13 +26,15 @@ class _SettingsPageState extends State<SettingsPage> {
     }
     _listLanguage = [
       DataHelper(title: Strings.of(context)!.english, type: 'en'),
-      DataHelper(title: Strings.of(context)!.bahasa, type: 'id'),
+      DataHelper(title: Strings.of(context)!.uzbek, type: 'uz'),
+      DataHelper(title: Strings.of(context)!.russian, type: 'ru'),
     ];
     final settings = context.read<SettingsCubit>().settings;
     _selectedTheme = settings.activeTheme;
-    _selectedLanguage = settings.type == 'id'
-        ? _listLanguage[1]
-        : _listLanguage[0];
+    _selectedLanguage = _listLanguage.firstWhere(
+      (element) => element.type == settings.type,
+      orElse: () => _listLanguage[0],
+    );
     _isInitialized = true;
   }
 

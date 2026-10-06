@@ -11,7 +11,7 @@ extension StringExtension on String {
 
   //https://github.com/ponnamkarthik/FlutterToast/issues/262
   //coverage:ignore-start
-  void toToastError(BuildContext context, {bool isUnitTest = false}) {
+  void toToastError({bool isUnitTest = false}) {
     try {
       final message = isEmpty ? 'error' : this;
 
@@ -20,10 +20,10 @@ extension StringExtension on String {
 
       showToastWidget(
         Toast(
-          bgColor: ColorScheme.of(context).error,
+          bgColor: Palette.error,
           icon: Icons.error,
           message: message,
-          textColor: Colors.white,
+          textColor: Palette.onError,
         ),
         dismissOtherToast: true,
         position: ToastPosition.top,
@@ -37,20 +37,19 @@ extension StringExtension on String {
     }
   }
 
-  void toToastSuccess(BuildContext context, {bool isUnitTest = false}) {
+  void toToastSuccess({bool isUnitTest = false}) {
     try {
       final message = isEmpty ? 'success' : this;
 
       //dismiss before show toast
       dismissAllToast(showAnim: true);
 
-      // showToast(msg)
       showToastWidget(
         Toast(
-          bgColor: ColorScheme.of(context).primary,
+          bgColor: Palette.primary,
           icon: Icons.check_circle,
           message: message,
-          textColor: Colors.white,
+          textColor: Palette.onPrimary,
         ),
         dismissOtherToast: true,
         position: ToastPosition.top,
@@ -64,7 +63,7 @@ extension StringExtension on String {
     }
   }
 
-  void toToastLoading(BuildContext context, {bool isUnitTest = false}) {
+  void toToastLoading({bool isUnitTest = false}) {
     try {
       final message = isEmpty ? 'loading' : this;
       //dismiss before show toast
@@ -72,10 +71,10 @@ extension StringExtension on String {
 
       showToastWidget(
         Toast(
-          bgColor: ColorScheme.of(context).tertiary,
+          bgColor: Palette.tertiary,
           icon: Icons.info,
           message: message,
-          textColor: Colors.white,
+          textColor: Palette.onTertiary,
         ),
         dismissOtherToast: true,
         position: ToastPosition.top,

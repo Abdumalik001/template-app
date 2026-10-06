@@ -1,7 +1,9 @@
 import 'package:cactus_hr/core/api/api.dart';
+import 'package:cactus_hr/core/localization/localization.dart';
 import 'package:cactus_hr/features/features.dart';
 import 'package:cactus_hr/utils/utils.dart';
 import 'package:get_it/get_it.dart';
+import 'package:material_ui/material_ui.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -17,6 +19,10 @@ Future<void> serviceLocator({
 
   if (isHiveEnable) {
     await _initAppStorage(prefixBox: prefixBox);
+    final savedLang = sl<AppStorageContract>().getPref<String>(PrefKey.locale) ?? 'en';
+    await AppLocale.setLocale(Locale(savedLang));
+  } else {
+    await AppLocale.setLocale(const Locale('en'));
   }
 
   sl

@@ -93,11 +93,11 @@ class _MainPageState extends State<MainPage> {
                       LogoutStateLoading() => ctx.show(),
                       LogoutStateFailure(:final message) => (() {
                         ctx.dismiss();
-                        message.toToastError(context);
+                        message.toToastError();
                       })(),
                       LogoutStateSuccess(:final message) => (() {
                         ctx.dismiss();
-                        message.toToastSuccess(context);
+                        message.toToastSuccess();
                         context.goNamed(Routes.root.name);
                       })(),
                     },

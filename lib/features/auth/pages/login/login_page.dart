@@ -46,16 +46,14 @@ class _LoginPageState extends State<LoginPage> {
     child: BlocListener<AuthCubit, AuthState>(
       listener: (_, state) => switch (state) {
         AuthStateLoading() => context.show(),
-        AuthStateSuccess(:final data) => (() {
+        AuthStateSuccess() => (() {
           context.dismiss();
-          data.toString().toToastSuccess(context);
-
           TextInput.finishAutofillContext();
           context.goNamed(Routes.root.name);
         })(),
         AuthStateFailure(:final message) => (() {
           context.dismiss();
-          message.toToastError(context);
+          message.toToastError();
         })(),
       },
       child: SafeArea(

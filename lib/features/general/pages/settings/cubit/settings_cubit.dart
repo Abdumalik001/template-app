@@ -1,7 +1,8 @@
-import 'package:cactus_hr/core/dependencies_injection.dart';
+import 'package:cactus_hr/core/core.dart';
 import 'package:cactus_hr/utils/utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:material_ui/material_ui.dart';
 
 part 'settings_cubit.freezed.dart';
 
@@ -21,9 +22,10 @@ class SettingsCubit extends Cubit<SettingsState> {
     emit(SettingsStateSuccess(_settings));
   }
 
-  void updateLanguage(String type) {
+  Future<void> updateLanguage(String type) async {
     /// Update locale code
-    _storage.setPref(PrefKey.locale, type);
+    await _storage.setPref(PrefKey.locale, type);
+    await AppLocale.setLocale(Locale(type));
     emit(SettingsStateSuccess(_settings));
   }
 

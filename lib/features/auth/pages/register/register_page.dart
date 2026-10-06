@@ -60,17 +60,15 @@ class _RegisterPageState extends State<RegisterPage> {
     child: BlocListener<RegisterCubit, RegisterState>(
       listener: (_, state) => switch (state) {
         RegisterStateLoading() => context.show(),
-        RegisterStateSuccess(:final data) => (() {
+        RegisterStateSuccess() => (() {
           context.dismiss();
-
-          data?.message?.toToastSuccess(context);
 
           /// back to login page after register success
           context.pop();
         })(),
         RegisterStateFailure(:final message) => (() {
           context.dismiss();
-          message.toToastError(context);
+          message.toToastError();
         })(),
       },
       child: SingleChildScrollView(
