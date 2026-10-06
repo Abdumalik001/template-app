@@ -49,7 +49,7 @@ class _SettingsPageState extends State<SettingsPage> {
             FadeSlideIn(
               child: DropDown<ActiveTheme>(
                 key: const Key('dropdown_theme'),
-                hint: Strings.of(context)!.chooseTheme,
+                hint: appStrings.chooseTheme,
                 value: _selectedTheme,
                 prefixIcon: Icon(
                   Icons.contrast_rounded,

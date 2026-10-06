@@ -40,22 +40,18 @@ ThemeData themeLight(BuildContext context) => _buildTheme(
     shadow: Palette.shadow,
   ),
   colors: const AppColors(
-    background: Palette.background,
-    surface: Palette.surface,
-    surfaceVariant: Palette.surfaceVariant,
-    onPrimary: Palette.onPrimary,
-    onSurfaceVariant: Palette.onSurfaceVariant,
-    textPrimary: Palette.textPrimary,
-    textSecondary: Palette.textSecondary,
-    textOnPrimary: Palette.textOnPrimary,
-    textOnSecondary: Palette.textOnSecondary,
-    textOnTertiary: Palette.textOnTertiary,
-    textOnError: Palette.textOnError,
-    textLink: Palette.textLink,
-    textError: Palette.textError,
-    textWarning: Palette.textWarning,
-    shadow: Palette.shadow,
+    success: Palette.success,
+    onSuccess: Palette.onSuccess,
+    successContainer: Palette.successContainer,
+    onSuccessContainer: Palette.onSuccessContainer,
     warning: Palette.warning,
+    onWarning: Palette.onWarning,
+    warningContainer: Palette.warningContainer,
+    onWarningContainer: Palette.onWarningContainer,
+    info: Palette.info,
+    onInfo: Palette.onInfo,
+    infoContainer: Palette.infoContainer,
+    onInfoContainer: Palette.onInfoContainer,
   ),
   cardColor: Palette.surface,
   overlayStyle: SystemUiOverlayStyle.dark,
@@ -95,22 +91,18 @@ ThemeData themeDark(BuildContext context) => _buildTheme(
     shadow: Palette.shadowDark,
   ),
   colors: const AppColors(
-    background: Palette.backgroundDark,
-    surface: Palette.surfaceDark,
-    surfaceVariant: Palette.surfaceVariantDark,
-    onPrimary: Palette.onPrimaryDark,
-    onSurfaceVariant: Palette.onSurfaceVariantDark,
-    textPrimary: Palette.textPrimaryDark,
-    textSecondary: Palette.textSecondaryDark,
-    textOnPrimary: Palette.textOnPrimaryDark,
-    textOnSecondary: Palette.textOnSecondaryDark,
-    textOnTertiary: Palette.textOnTertiaryDark,
-    textOnError: Palette.textOnErrorDark,
-    textLink: Palette.textLinkDark,
-    textError: Palette.textErrorDark,
-    textWarning: Palette.textWarningDark,
-    shadow: Palette.shadowDark,
+    success: Palette.successDark,
+    onSuccess: Palette.onSuccessDark,
+    successContainer: Palette.successContainerDark,
+    onSuccessContainer: Palette.onSuccessContainerDark,
     warning: Palette.warningDark,
+    onWarning: Palette.onWarningDark,
+    warningContainer: Palette.warningContainerDark,
+    onWarningContainer: Palette.onWarningContainerDark,
+    info: Palette.infoDark,
+    onInfo: Palette.onInfoDark,
+    infoContainer: Palette.infoContainerDark,
+    onInfoContainer: Palette.onInfoContainerDark,
   ),
   cardColor: Palette.surfaceDark,
   overlayStyle: SystemUiOverlayStyle.light,
@@ -302,77 +294,61 @@ TextTheme _textTheme(Color color) {
 }
 
 class AppColors extends ThemeExtension<AppColors> {
-  final Color? background;
-  final Color? surface;
-  final Color? surfaceVariant;
-  final Color? onPrimary;
-  final Color? onSurfaceVariant;
-  final Color? textPrimary;
-  final Color? textSecondary;
-  final Color? textOnPrimary;
-  final Color? textOnSecondary;
-  final Color? textOnTertiary;
-  final Color? textOnError;
-  final Color? textLink;
-  final Color? textError;
-  final Color? textWarning;
-  final Color? shadow;
+  final Color? success;
+  final Color? onSuccess;
+  final Color? successContainer;
+  final Color? onSuccessContainer;
   final Color? warning;
+  final Color? onWarning;
+  final Color? warningContainer;
+  final Color? onWarningContainer;
+  final Color? info;
+  final Color? onInfo;
+  final Color? infoContainer;
+  final Color? onInfoContainer;
 
   const AppColors({
-    this.background,
-    this.surface,
-    this.surfaceVariant,
-    this.onPrimary,
-    this.onSurfaceVariant,
-    this.textPrimary,
-    this.textSecondary,
-    this.textOnPrimary,
-    this.textOnSecondary,
-    this.textOnTertiary,
-    this.textOnError,
-    this.textLink,
-    this.textError,
-    this.textWarning,
-    this.shadow,
+    this.success,
+    this.onSuccess,
+    this.successContainer,
+    this.onSuccessContainer,
     this.warning,
+    this.onWarning,
+    this.warningContainer,
+    this.onWarningContainer,
+    this.info,
+    this.onInfo,
+    this.infoContainer,
+    this.onInfoContainer,
   });
 
   @override
   ThemeExtension<AppColors> copyWith({
-    Color? background,
-    Color? surface,
-    Color? surfaceVariant,
-    Color? onPrimary,
-    Color? onSurfaceVariant,
-    Color? textPrimary,
-    Color? textSecondary,
-    Color? textOnPrimary,
-    Color? textOnSecondary,
-    Color? textOnTertiary,
-    Color? textOnError,
-    Color? textLink,
-    Color? textError,
-    Color? textWarning,
-    Color? shadow,
+    Color? success,
+    Color? onSuccess,
+    Color? successContainer,
+    Color? onSuccessContainer,
     Color? warning,
+    Color? onWarning,
+    Color? warningContainer,
+    Color? onWarningContainer,
+    Color? info,
+    Color? onInfo,
+    Color? infoContainer,
+    Color? onInfoContainer,
   }) => AppColors(
-    background: background ?? this.background,
-    surface: surface ?? this.surface,
-    surfaceVariant: surfaceVariant ?? this.surfaceVariant,
-    onPrimary: onPrimary ?? this.onPrimary,
-    onSurfaceVariant: onSurfaceVariant ?? this.onSurfaceVariant,
-    textPrimary: textPrimary ?? this.textPrimary,
-    textSecondary: textSecondary ?? this.textSecondary,
-    textOnPrimary: textOnPrimary ?? this.textOnPrimary,
-    textOnSecondary: textOnSecondary ?? this.textOnSecondary,
-    textOnTertiary: textOnTertiary ?? this.textOnTertiary,
-    textOnError: textOnError ?? this.textOnError,
-    textLink: textLink ?? this.textLink,
-    textError: textError ?? this.textError,
-    textWarning: textWarning ?? this.textWarning,
-    shadow: shadow ?? this.shadow,
+    success: success ?? this.success,
+    onSuccess: onSuccess ?? this.onSuccess,
+    successContainer: successContainer ?? this.successContainer,
+    onSuccessContainer: onSuccessContainer ?? this.onSuccessContainer,
     warning: warning ?? this.warning,
+    onWarning: onWarning ?? this.onWarning,
+    warningContainer: warningContainer ?? this.warningContainer,
+    onWarningContainer: onWarningContainer ?? this.onWarningContainer,
+    info: info ?? this.info,
+    onInfo: onInfo ?? this.onInfo,
+    infoContainer: infoContainer ?? this.infoContainer,
+    onInfoContainer: onInfoContainer ?? this.onInfoContainer,
   );
 
   @override
@@ -384,24 +360,24 @@ class AppColors extends ThemeExtension<AppColors> {
       return this;
     }
     return AppColors(
-      background: Color.lerp(background, other.background, t),
-      surface: Color.lerp(surface, other.surface, t),
-      surfaceVariant: Color.lerp(surfaceVariant, other.surfaceVariant, t),
-      onPrimary: Color.lerp(onPrimary, other.onPrimary, t),
-      onSurfaceVariant: Color.lerp(onSurfaceVariant, other.onSurfaceVariant, t),
-      textPrimary: Color.lerp(textPrimary, other.textPrimary, t),
-      textSecondary: Color.lerp(textSecondary, other.textSecondary, t),
-      textOnPrimary: Color.lerp(textOnPrimary, other.textOnPrimary, t),
-      textOnSecondary: Color.lerp(textOnSecondary, other.textOnSecondary, t),
-      textOnTertiary: Color.lerp(textOnTertiary, other.textOnTertiary, t),
-      textOnError: Color.lerp(textOnError, other.textOnError, t),
-      textLink: Color.lerp(textLink, other.textLink, t),
-      textError: Color.lerp(textError, other.textError, t),
-      textWarning: Color.lerp(textWarning, other.textWarning, t),
-      shadow: Color.lerp(shadow, other.shadow, t),
+      success: Color.lerp(success, other.success, t),
+      onSuccess: Color.lerp(onSuccess, other.onSuccess, t),
+      successContainer: Color.lerp(successContainer, other.successContainer, t),
+      onSuccessContainer: Color.lerp(onSuccessContainer, other.onSuccessContainer, t),
       warning: Color.lerp(warning, other.warning, t),
+      onWarning: Color.lerp(onWarning, other.onWarning, t),
+      warningContainer: Color.lerp(warningContainer, other.warningContainer, t),
+      onWarningContainer: Color.lerp(onWarningContainer, other.onWarningContainer, t),
+      info: Color.lerp(info, other.info, t),
+      onInfo: Color.lerp(onInfo, other.onInfo, t),
+      infoContainer: Color.lerp(infoContainer, other.infoContainer, t),
+      onInfoContainer: Color.lerp(onInfoContainer, other.onInfoContainer, t),
     );
   }
+}
+
+extension AppThemeContext on BuildContext {
+  AppColors get colors => Theme.of(this).extension<AppColors>() ?? const AppColors();
 }
 
 class BoxDecorations {
