@@ -71,6 +71,5 @@ void _cubits() {
     ..registerFactory(() => LogoutCubit(sl()))
     ..registerFactory(() => UserCubit(sl()))
     ..registerFactory(() => UsersCubit(sl()))
-    ..registerFactory(SettingsCubit.new)
-    ..registerFactory(MainCubit.new);
+    ..registerFactory(SettingsCubit.new);
 }

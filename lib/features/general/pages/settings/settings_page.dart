@@ -2,6 +2,7 @@ import 'package:cactus_hr/core/core.dart';
 import 'package:cactus_hr/features/features.dart';
 import 'package:cactus_hr/utils/utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -40,6 +41,17 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) => Parent(
+    appBar: AppBar(
+      centerTitle: true,
+      title: Text(Strings.of(context)!.settings),
+      leading: IconButton(
+        icon: Icon(
+          Icons.arrow_back_ios_new_rounded,
+          size: Dimens.space20,
+        ),
+        onPressed: () => context.pop(),
+      ),
+    ),
     child: SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.all(Dimens.space16),

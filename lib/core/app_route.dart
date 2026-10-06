@@ -57,26 +57,18 @@ class AppRoute {
           child: const RegisterPage(),
         ),
       ),
-      ShellRoute(
-        builder: (_, _, child) => BlocProvider(
-          create: (context) => sl<MainCubit>(),
-          child: MainPage(child: child),
+      GoRoute(
+        path: Routes.dashboard.path,
+        name: Routes.dashboard.name,
+        builder: (_, _) => BlocProvider(
+          create: (_) => sl<UsersCubit>()..fetchUsers(const UsersParams()),
+          child: const DashboardPage(),
         ),
-        routes: [
-          GoRoute(
-            path: Routes.dashboard.path,
-            name: Routes.dashboard.name,
-            builder: (_, _) => BlocProvider(
-              create: (_) => sl<UsersCubit>()..fetchUsers(const UsersParams()),
-              child: const DashboardPage(),
-            ),
-          ),
-          GoRoute(
-            path: Routes.settings.path,
-            name: Routes.settings.name,
-            builder: (_, _) => const SettingsPage(),
-          ),
-        ],
+      ),
+      GoRoute(
+        path: Routes.settings.path,
+        name: Routes.settings.name,
+        builder: (_, _) => const SettingsPage(),
       ),
     ],
     initialLocation: Routes.splashScreen.path,

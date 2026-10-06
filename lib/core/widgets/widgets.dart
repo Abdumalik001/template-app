@@ -8,6 +8,7 @@ export 'drop_down.dart';
 export 'empty.dart';
 export 'fade_slide_in.dart';
 export 'loading.dart';
+export 'menu_drawer/menu_drawer.dart';
 export 'my_appbar.dart';
 export 'parent.dart';
 export 'spacer_h.dart';

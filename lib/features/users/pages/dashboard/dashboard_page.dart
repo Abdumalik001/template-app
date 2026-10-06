@@ -28,6 +28,8 @@ class _DashboardPageState extends State<DashboardPage> {
       //coverage:ignore-end
     });
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -36,6 +38,24 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) => Parent(
+    scaffoldKey: _scaffoldKey,
+    appBar: AppBar(
+      centerTitle: true,
+      title: Text(Strings.of(context)!.dashboard),
+      leading: IconButton(
+        icon: Icon(
+          Icons.menu_rounded,
+          size: Dimens.space24,
+          semanticLabel: Strings.of(context)!.menu,
+        ),
+        onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+      ),
+      actions: const [ButtonNotification()],
+    ),
+    drawer: SizedBox(
+      width: context.widthInPercent(78),
+      child: const MenuDrawer(),
+    ),
     child: RefreshIndicator(
       color: ColorScheme.of(context).primary,
       backgroundColor: ColorScheme.of(context).surface,

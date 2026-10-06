@@ -150,31 +150,22 @@ ThemeData _buildTheme({
       elevation: Dimens.zero,
       scrolledUnderElevation: Dimens.zero,
       centerTitle: true,
-      titleTextStyle: textTheme.titleMedium?.copyWith(
-        fontWeight: FontWeight.w600,
-      ),
+      titleTextStyle: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
       iconTheme: IconThemeData(color: colorScheme.onSurface),
-      systemOverlayStyle: overlayStyle.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
+      systemOverlayStyle: overlayStyle.copyWith(statusBarColor: Colors.transparent),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: colorScheme.surfaceContainer,
       isDense: true,
-      hintStyle: textTheme.bodyMedium?.copyWith(
-        color: colorScheme.onSurfaceVariant,
-      ),
+      hintStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
       prefixIconColor: WidgetStateColor.resolveWith(
         (states) => states.contains(WidgetState.focused)
             ? colorScheme.primary
             : colorScheme.onSurfaceVariant,
       ),
       suffixIconColor: colorScheme.onSurfaceVariant,
-      border: const OutlineInputBorder(
-        borderRadius: fieldRadius,
-        borderSide: BorderSide.none,
-      ),
+      border: const OutlineInputBorder(borderRadius: fieldRadius, borderSide: BorderSide.none),
       enabledBorder: OutlineInputBorder(
         borderRadius: fieldRadius,
         borderSide: BorderSide(color: colorScheme.surfaceContainer),
@@ -206,21 +197,15 @@ ThemeData _buildTheme({
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(Dimens.cornerRadiusLg)),
       ),
-      titleTextStyle: textTheme.titleLarge?.copyWith(
-        fontWeight: FontWeight.w600,
-      ),
-      contentTextStyle: textTheme.bodyMedium?.copyWith(
-        color: colorScheme.onSurfaceVariant,
-      ),
+      titleTextStyle: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+      contentTextStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
     ),
     drawerTheme: DrawerThemeData(
       elevation: Dimens.zero,
       backgroundColor: colorScheme.surface,
       surfaceTintColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.horizontal(
-          right: Radius.circular(Dimens.cornerRadiusLg),
-        ),
+        borderRadius: BorderRadius.horizontal(right: Radius.circular(Dimens.cornerRadiusLg)),
       ),
     ),
     bottomSheetTheme: BottomSheetThemeData(
@@ -233,11 +218,7 @@ ThemeData _buildTheme({
       circularTrackColor: colorScheme.primaryContainer,
       strokeCap: StrokeCap.round,
     ),
-    dividerTheme: DividerThemeData(
-      color: colorScheme.outline,
-      thickness: 1,
-      space: 1,
-    ),
+    dividerTheme: DividerThemeData(color: colorScheme.outline, thickness: 1, space: 1),
     extensions: <ThemeExtension<dynamic>>[colors],
   );
 }
@@ -260,26 +241,21 @@ SkeletonizerConfigData skeletonConfig(BuildContext context) {
 }
 
 TextTheme _textTheme(Color color) {
-  TextStyle style(double size, FontWeight weight, {double spacing = 0}) =>
-      TextStyle(
-        fontFamily: _fontFamily,
-        fontSize: size,
-        fontWeight: weight,
-        letterSpacing: spacing,
-        color: color,
-        height: 1.3,
-      );
+  TextStyle style(double size, FontWeight weight, {double spacing = 0}) => TextStyle(
+    fontFamily: _fontFamily,
+    fontSize: size,
+    fontWeight: weight,
+    letterSpacing: spacing,
+    color: color,
+    height: 1.3,
+  );
 
   return TextTheme(
     displayLarge: style(Dimens.displayLarge, FontWeight.w600, spacing: -1.5),
     displayMedium: style(Dimens.displayMedium, FontWeight.w600, spacing: -1),
     displaySmall: style(Dimens.displaySmall, FontWeight.w600, spacing: -0.8),
     headlineLarge: style(Dimens.headlineLarge, FontWeight.w600, spacing: -0.6),
-    headlineMedium: style(
-      Dimens.headlineMedium,
-      FontWeight.w600,
-      spacing: -0.6,
-    ),
+    headlineMedium: style(Dimens.headlineMedium, FontWeight.w600, spacing: -0.6),
     headlineSmall: style(Dimens.headlineSmall, FontWeight.w600, spacing: -0.4),
     titleLarge: style(Dimens.titleLarge, FontWeight.w600, spacing: -0.2),
     titleMedium: style(Dimens.titleMedium, FontWeight.w500, spacing: -0.1),
@@ -352,10 +328,7 @@ class AppColors extends ThemeExtension<AppColors> {
   );
 
   @override
-  ThemeExtension<AppColors> lerp(
-    covariant ThemeExtension<AppColors>? other,
-    double t,
-  ) {
+  ThemeExtension<AppColors> lerp(covariant ThemeExtension<AppColors>? other, double t) {
     if (other is! AppColors) {
       return this;
     }
@@ -439,10 +412,8 @@ class BoxShadows {
     blurRadius: 16.0,
   );
 
-  BoxShadow get buttonMenu => BoxShadow(
-    color: ColorScheme.of(context).shadow.withAlpha(10),
-    blurRadius: 4.0,
-  );
+  BoxShadow get buttonMenu =>
+      BoxShadow(color: ColorScheme.of(context).shadow.withAlpha(10), blurRadius: 4.0);
 
   BoxShadow get navigation => BoxShadow(
     color: ColorScheme.of(context).shadow.withAlpha(30),
