@@ -292,6 +292,8 @@ def main():
 
         steps = [
             ("Running flutter pub get", f"{flutter_cmd} pub get"),
+            ("Generating launcher icons", f"{dart_cmd} run flutter_launcher_icons -f flutter_launcher_icons-prd.yaml && {dart_cmd} run flutter_launcher_icons -f flutter_launcher_icons-stg.yaml"),
+            ("Generating native splash screen", f"{dart_cmd} run flutter_native_splash:create --path=flutter_native_splash-prd.yaml && {dart_cmd} run flutter_native_splash:create --path=flutter_native_splash-stg.yaml"),
             ("Running build_runner codegen", f"{dart_cmd} run build_runner build --delete-conflicting-outputs"),
             ("Applying automatic dart fixes", f"{dart_cmd} fix --apply lib/"),
             ("Formatting Dart files", f"{dart_cmd} format lib/"),

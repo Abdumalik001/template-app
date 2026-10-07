@@ -45,7 +45,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:520881115656:android:5ce1808f01692ab2fd77bd",
         "android_client_info": {
-          "package_name": "com.lazycatlabs.auth"
+          "package_name": "com.template.app"
         }
       },
       "oauth_client": [
@@ -81,7 +81,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:520881115656:android:2ccc910b48e53ef3fd77bd",
         "android_client_info": {
-          "package_name": "com.lazycatlabs.auth.stg"
+          "package_name": "com.template.app.stg"
         }
       },
       "oauth_client": [
