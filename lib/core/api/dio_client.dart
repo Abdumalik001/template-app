@@ -1,76 +1,41 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/utils/utils.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/utils/utils.dart';
 
 typedef ResponseConverter<T> = T Function(dynamic response);
 
 class DioClient with FirebaseCrashLogger {
   final String baseUrl;
 
-  String? _token;
-  bool _isUnitTest = false;
-  late Dio _dio;
+  final bool isUnitTest;
+  final Future<void> Function()? onLogout;
+  late final Dio _dio;
 
-  DioClient({bool isUnitTest = false, String? baseUrl})
+  DioClient({this.isUnitTest = false, String? baseUrl, this.onLogout})
     : baseUrl = baseUrl ?? const String.fromEnvironment('BASE_URL') {
-    _isUnitTest = isUnitTest;
+    _dio = Dio(
+      BaseOptions(
+        baseUrl: this.baseUrl,
+        headers: const {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        receiveTimeout: const Duration(minutes: 1),
+        connectTimeout: const Duration(minutes: 1),
+        validateStatus: (int? status) => status != null && status > 0,
+      ),
+    );
 
-    try {
-      _token = token();
-    } catch (_) {}
-
-    _dio = _createDio();
-
-    if (!_isUnitTest) {
-      _dio.interceptors.add(DioInterceptor());
+    if (!isUnitTest) {
+      _dio.interceptors.add(
+        DioInterceptor(dioFactory: () => _dio, onLogout: onLogout),
+      );
     }
   }
 
-  String token() {
-    if (sl.isRegistered<AppStorageContract>()) {
-      final storage = sl<AppStorageContract>();
-      final cachedToken = storage.token;
-      if (cachedToken != null && cachedToken.isNotEmpty) {
-        return cachedToken;
-      }
-    }
-    return '';
-  }
-
-  Dio get dio {
-    if (_isUnitTest) {
-      /// Return static dio if is unit test
-      return _dio;
-    } else {
-      /// We need to recreate dio to avoid token issue after login
-      try {
-        _token = token();
-      } catch (_) {}
-
-      final dio = _createDio();
-
-      if (!_isUnitTest) {
-        dio.interceptors.add(DioInterceptor());
-      }
-
-      return dio;
-    }
-  }
-
-  Dio _createDio() => Dio(
-    BaseOptions(
-      baseUrl: baseUrl,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        if (_token != null) ...{'Authorization': _token},
-      },
-      receiveTimeout: const Duration(minutes: 1),
-      connectTimeout: const Duration(minutes: 1),
-      validateStatus: (int? status) => status! > 0,
-    ),
-  );
+  /// Returns the underlying [Dio] instance with connection pooling enabled.
+  Dio get dio => _dio;
 
   Future<Either<Failure, T>> getRequest<T>(
     String url, {
@@ -80,32 +45,37 @@ class DioClient with FirebaseCrashLogger {
     bool includeAuthorization = true,
   }) async {
     try {
-      final requestDio = dio;
-      if (!includeAuthorization) {
-        requestDio.options.headers.remove('Authorization');
-      }
-      final response = await requestDio.get(url, queryParameters: queryParameters);
-      if ((response.statusCode ?? 0) < 200 || (response.statusCode ?? 0) > 201) {
-        throw DioException(requestOptions: response.requestOptions, response: response);
+      final response = await _dio.get(
+        url,
+        queryParameters: queryParameters,
+        options: Options(
+          extra: {DioInterceptor.requireAuthKey: includeAuthorization},
+        ),
+      );
+      if ((response.statusCode ?? 0) < 200 ||
+          (response.statusCode ?? 0) > 201) {
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+        );
       }
 
       if (!isIsolate) {
         return Right(converter(response.data));
       }
-      final isolateParse = IsolateParser<T>(response.data as Map<String, dynamic>, converter);
+      final isolateParse = IsolateParser<T>(
+        response.data as Map<String, dynamic>,
+        converter,
+      );
       final result = await isolateParse.parseInBackground();
       return Right(result);
     } on DioException catch (e, stackTrace) {
-      try {
-        if (!_isUnitTest) {
-          nonFatalError(error: e, stackTrace: stackTrace);
-        }
-        return Left(
-          ServerFailure(e.response?.data['diagnostic']['message'] as String? ?? e.message),
-        );
-      } catch (e) {
-        return Left(ServerFailure(e.toString()));
+      if (!isUnitTest) {
+        nonFatalError(error: e, stackTrace: stackTrace);
       }
+      return Left(DioErrorHandler.handle(e));
+    } catch (e) {
+      return Left(UnknownFailure(e.toString()));
     }
   }
 
@@ -117,32 +87,37 @@ class DioClient with FirebaseCrashLogger {
     bool includeAuthorization = true,
   }) async {
     try {
-      final requestDio = dio;
-      if (!includeAuthorization) {
-        requestDio.options.headers.remove('Authorization');
-      }
-      final response = await requestDio.post(url, data: data);
-      if ((response.statusCode ?? 0) < 200 || (response.statusCode ?? 0) > 201) {
-        throw DioException(requestOptions: response.requestOptions, response: response);
+      final response = await _dio.post(
+        url,
+        data: data,
+        options: Options(
+          extra: {DioInterceptor.requireAuthKey: includeAuthorization},
+        ),
+      );
+      if ((response.statusCode ?? 0) < 200 ||
+          (response.statusCode ?? 0) > 201) {
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+        );
       }
 
       if (!isIsolate) {
         return Right(converter(response.data));
       }
-      final isolateParse = IsolateParser<T>(response.data as Map<String, dynamic>, converter);
+      final isolateParse = IsolateParser<T>(
+        response.data as Map<String, dynamic>,
+        converter,
+      );
       final result = await isolateParse.parseInBackground();
       return Right(result);
     } on DioException catch (e, stackTrace) {
-      try {
-        if (!_isUnitTest) {
-          nonFatalError(error: e, stackTrace: stackTrace);
-        }
-        return Left(
-          ServerFailure(e.response?.data['diagnostic']['message'] as String? ?? e.message),
-        );
-      } catch (e) {
-        return Left(ServerFailure(e.toString()));
+      if (!isUnitTest) {
+        nonFatalError(error: e, stackTrace: stackTrace);
       }
+      return Left(DioErrorHandler.handle(e));
+    } catch (e) {
+      return Left(UnknownFailure(e.toString()));
     }
   }
 }

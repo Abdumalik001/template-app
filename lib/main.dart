@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:cactus_hr/app.dart';
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/utils/utils.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:template_app/app.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/utils/utils.dart';
 
 void main() {
   runZonedGuarded(
@@ -22,6 +22,7 @@ void main() {
         DeviceOrientation.portraitDown,
       ]).then((_) => runApp(const App()));
     },
-    (error, stackTrace) => FirebaseCrashlytics.instance.recordError(error, stackTrace),
+    (error, stackTrace) =>
+        FirebaseCrashlytics.instance.recordError(error, stackTrace),
   );
 }

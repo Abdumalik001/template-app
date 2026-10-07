@@ -1,7 +1,7 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/features/features.dart';
-import 'package:cactus_hr/utils/utils.dart';
 import 'package:dartz/dartz.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/features/features.dart';
+import 'package:template_app/utils/utils.dart';
 
 class PostLogout extends UseCase<String, NoParams> {
   final AuthRepository _repo;
@@ -13,11 +13,12 @@ class PostLogout extends UseCase<String, NoParams> {
   @override
   Future<Either<Failure, String>> call(NoParams _) async {
     final result = await _repo.logout();
-    return await result.fold<Future<Either<Failure, String>>>((failure) async => Left(failure), (
-      message,
-    ) async {
-      await _storage.clearSession();
-      return Right(message);
-    });
+    return await result.fold<Future<Either<Failure, String>>>(
+      (failure) async => Left(failure),
+      (message) async {
+        await _storage.clearSession();
+        return Right(message);
+      },
+    );
   }
 }

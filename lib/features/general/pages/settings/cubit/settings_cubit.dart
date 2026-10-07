@@ -1,8 +1,8 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/utils/utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/utils/utils.dart';
 
 part 'settings_cubit.freezed.dart';
 
@@ -31,7 +31,8 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   ActiveTheme getActiveTheme() => ActiveTheme.values.singleWhere(
     (element) =>
-        element.name == (_storage.getPref<String>(PrefKey.theme) ?? ActiveTheme.system.name),
+        element.name ==
+        (_storage.getPref<String>(PrefKey.theme) ?? ActiveTheme.system.name),
   );
 
   DataHelper get _settings => DataHelper(

@@ -1,9 +1,9 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/features/features.dart';
-import 'package:cactus_hr/utils/utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/features/features.dart';
+import 'package:template_app/utils/utils.dart';
 
 part 'register_form.dart';
 
@@ -30,14 +30,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final _isValid = ValueNotifier(false);
 
-  /// isPasswordVisible
-  final _isPasswordVisible = ValueNotifier(false);
-  final _isPasswordRepeatVisible = ValueNotifier(false);
-
   @override
   void dispose() {
-    _isPasswordVisible.dispose();
-    _isPasswordRepeatVisible.dispose();
     _isValid.dispose();
 
     _conName.dispose();
@@ -89,8 +83,6 @@ class _RegisterPageState extends State<RegisterPage> {
             _RegisterForm(
               formKey: _formKey,
               isValid: _isValid,
-              isPasswordVisible: _isPasswordVisible,
-              isPasswordRepeatVisible: _isPasswordRepeatVisible,
               nameController: _conName,
               emailController: _conEmail,
               passwordController: _conPassword,

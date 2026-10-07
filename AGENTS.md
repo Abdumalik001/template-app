@@ -16,7 +16,7 @@ any project on this stack.
 
 | Item               | Value                                                                                           |
 |--------------------|-------------------------------------------------------------------------------------------------|
-| App / package name | `cactus_hr` — imports use `package:cactus_hr/...`                                     |
+| App / package name | `template_app` — imports use `package:template_app/...`                                     |
 | Version            | `<version+build from pubspec.yaml>`                                                             |
 | Dart SDK           | `<constraint from pubspec.yaml>`                                                                |
 | Flavors            | `<e.g. stg, prd — or "none">`                                                                   |

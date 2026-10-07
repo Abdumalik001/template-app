@@ -39,5 +39,11 @@
   "loginSubtitle": "Davom etish uchun hisobingizga kiring",
   "createAccount": "Hisob yaratish",
   "registerSubtitle": "Boshlash uchun atigi bir daqiqa kerak",
-  "loginSuccess": "Muvaffaqiyatli kirildi"
+  "loginSuccess": "Muvaffaqiyatli kirildi",
+  "errorNetwork": "Internet aloqasi mavjud emas. Tarmoqni tekshirib qayta urinib ko'ring.",
+  "errorTimeout": "Server bilan ulanish vaqti tugadi. Keyinroq qayta urinib ko'ring.",
+  "errorUnauthorized": "Sessiya muddati tugadi. Iltimos, qayta kiring.",
+  "errorServer": "Serverda xatolik yuz berdi. Keyinroq qayta urinib ko'ring.",
+  "errorUnknown": "Kutilmagan xatolik yuz berdi. Qayta urinib ko'ring.",
+  "retry": "Qayta urinish"
 }

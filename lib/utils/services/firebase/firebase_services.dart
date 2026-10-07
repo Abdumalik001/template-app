@@ -1,8 +1,8 @@
 import 'dart:isolate';
 
-import 'package:cactus_hr/utils/utils.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:template_app/utils/utils.dart';
 
 mixin FirebaseServices {
   static Future<void> init() async {

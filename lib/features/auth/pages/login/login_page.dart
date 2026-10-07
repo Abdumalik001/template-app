@@ -1,12 +1,13 @@
 import 'dart:io';
 
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/features/features.dart';
-import 'package:cactus_hr/utils/utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/features/features.dart';
+import 'package:template_app/utils/utils.dart';
 
 part 'login_form.dart';
 
@@ -24,15 +25,23 @@ class _LoginPageState extends State<LoginPage> {
 
   final _formKey = GlobalKey<FormState>();
   final _isValid = ValueNotifier(false);
-  final _isPasswordVisible = ValueNotifier(false);
 
   /// Focus Node
   final _fnEmail = FocusNode();
   final _fnPassword = FocusNode();
 
   @override
+  void initState() {
+    super.initState();
+    if (kDebugMode) {
+      _conEmail.text = 'eve.holt@reqres.in';
+      _conPassword.text = 'cityslicka';
+      _isValid.value = true;
+    }
+  }
+
+  @override
   void dispose() {
-    _isPasswordVisible.dispose();
     _isValid.dispose();
     _conEmail.dispose();
     _conPassword.dispose();
@@ -45,12 +54,14 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) => Parent(
     child: BlocListener<AuthCubit, AuthState>(
       listener: (_, state) => switch (state) {
+        AuthStateInitial() => null,
         AuthStateLoading() => context.show(),
         AuthStateSuccess() => (() {
           context.dismiss();
           TextInput.finishAutofillContext();
           context.goNamed(Routes.root.name);
         })(),
+        AuthStateUnauthenticated() => context.dismiss(),
         AuthStateFailure(:final message) => (() {
           context.dismiss();
           message.toToastError();
@@ -72,7 +83,6 @@ class _LoginPageState extends State<LoginPage> {
                   _LoginForm(
                     formKey: _formKey,
                     isValid: _isValid,
-                    isPasswordVisible: _isPasswordVisible,
                     emailController: _conEmail,
                     passwordController: _conPassword,
                     emailFocusNode: _fnEmail,

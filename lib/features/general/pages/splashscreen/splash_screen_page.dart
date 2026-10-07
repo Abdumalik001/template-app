@@ -1,7 +1,7 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/utils/utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/utils/utils.dart';
 
 class SplashScreenPage extends StatelessWidget {
   const SplashScreenPage({super.key});
@@ -15,7 +15,16 @@ class SplashScreenPage extends StatelessWidget {
           tween: Tween(begin: 0.85, end: 1),
           duration: Motion.slow,
           curve: Motion.emphasized,
-          onEnd: () => context.goNamed(Routes.root.name),
+          onEnd: () {
+            final isLoggedIn =
+                sl.isRegistered<AppStorageContract>() &&
+                sl<AppStorageContract>().isLoggedIn;
+            if (isLoggedIn) {
+              context.goNamed(Routes.dashboard.name);
+            } else {
+              context.goNamed(Routes.login.name);
+            }
+          },
           builder: (_, scale, child) => Transform.scale(
             scale: scale,
             child: Opacity(

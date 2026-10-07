@@ -8,19 +8,23 @@ class Palette {
   // --- Neutrals (Light Mode) ---
   /// Clean, crisp off-white background with zero pink tint.
   static const Color background = Color(0xffF8FAFC); // Slate 50
-  static const Color surface = Color(0xffFFFFFF);    // Pure White
+  static const Color surface = Color(0xffFFFFFF); // Pure White
   static const Color surfaceContainer = Color(0xffF1F5F9); // Slate 100
   static const Color surfaceContainerHigh = Color(0xffE2E8F0); // Slate 200
   static const Color surfaceVariant = Color(0xffEDF2F7);
-  static const Color onSurface = Color(0xff0F172A); // Slate 900 (High contrast dark)
-  static const Color onSurfaceVariant = Color(0xff64748B); // Slate 500 (Muted gray)
+  static const Color onSurface = Color(
+    0xff0F172A,
+  ); // Slate 900 (High contrast dark)
+  static const Color onSurfaceVariant = Color(
+    0xff64748B,
+  ); // Slate 500 (Muted gray)
   static const Color outline = Color(0xffE2E8F0); // Slate 200 border
   static const Color shadow = Color(0xff0F172A);
 
   // --- Neutrals (Dark Mode) ---
   /// Deep slate-tinted dark background (not flat pitch black, easier on eyes).
   static const Color backgroundDark = Color(0xff0B111E); // Deep Slate Navy
-  static const Color surfaceDark = Color(0xff151E2E);    // Slate Dark Card
+  static const Color surfaceDark = Color(0xff151E2E); // Slate Dark Card
   static const Color surfaceContainerDark = Color(0xff1E293B); // Slate 800
   static const Color surfaceContainerHighDark = Color(0xff334155); // Slate 700
   static const Color surfaceVariantDark = Color(0xff1E293B);

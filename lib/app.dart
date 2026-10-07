@@ -1,12 +1,12 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/features/features.dart';
-import 'package:cactus_hr/utils/utils.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/features/features.dart';
+import 'package:template_app/utils/utils.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -20,9 +20,11 @@ class App extends StatelessWidget {
     log.d(const String.fromEnvironment('ENV'));
     return MultiBlocProvider(
       providers: [
+        BlocProvider(create: (_) => sl<MainCubit>()),
         BlocProvider(create: (_) => sl<SettingsCubit>()..loadSettings()),
         BlocProvider(create: (_) => sl<AuthCubit>()),
         BlocProvider(create: (_) => sl<LogoutCubit>()),
+        BlocProvider(create: (_) => sl<UserCubit>()),
       ],
       child: OKToast(
         child: ScreenUtilInit(
@@ -33,19 +35,20 @@ class App extends StatelessWidget {
           splitScreenMode: true,
           builder: (context, _) {
             /// Pass context to appRoute
-            AppRoute.setStream(context);
+            AppRouter.setStream(context);
 
             return BlocBuilder<SettingsCubit, SettingsState>(
               builder: (_, state) {
                 final data = switch (state) {
                   SettingsStateSuccess(:final data) => data,
-                  SettingsStateLoading() || SettingsStateFailure() => const DataHelper(
+                  SettingsStateLoading() ||
+                  SettingsStateFailure() => const DataHelper(
                     type: 'en',
                     activeTheme: ActiveTheme.system,
                   ),
                 };
                 return MaterialApp.router(
-                  routerConfig: AppRoute.router,
+                  routerConfig: AppRouter.router,
                   localizationsDelegates: const [
                     Strings.delegate,
                     ...GlobalMaterialLocalizations.delegates,

@@ -1,10 +1,9 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/features/users/users.dart';
-import 'package:cactus_hr/utils/utils.dart';
-import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/features/users/users.dart';
+import 'package:template_app/utils/utils.dart';
 
 part 'dashboard_empty.dart';
 part 'dashboard_loading.dart';
@@ -18,23 +17,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  late final ScrollController _scrollController = ScrollController()
-    ..addListener(() {
-      //coverage:ignore-start
-      if (_scrollController.position.atEdge &&
-          _scrollController.position.pixels != 0) {
-        context.read<UsersCubit>().nextPage();
-      }
-      //coverage:ignore-end
-    });
-
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) => Parent(
@@ -56,48 +39,30 @@ class _DashboardPageState extends State<DashboardPage> {
       width: context.widthInPercent(78),
       child: const MenuDrawer(),
     ),
-    child: RefreshIndicator(
-      color: ColorScheme.of(context).primary,
-      backgroundColor: ColorScheme.of(context).surface,
-      onRefresh: () => context.read<UsersCubit>().refresh(),
-      child: BlocBuilder<UsersCubit, UsersState>(
-        builder: (_, state) => AnimatedSwitcher(
-          duration: Motion.medium,
-          switchInCurve: Motion.emphasized,
-          switchOutCurve: Motion.standard,
-          child: KeyedSubtree(
-            /// Only animate between skeleton and content; pagination
-            /// re-emits success and must not replay the transition.
-            key: ValueKey(state is UsersStateLoading),
-            child: switch (state) {
-              UsersStateLoading() => const _DashboardLoading(),
-              UsersStateInitial() => const SizedBox.shrink(),
-              UsersStateSuccess(:final data) => ListView.builder(
-                controller: _scrollController,
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: data.currentPage == data.lastPage
-                    ? data
-                          .users
-                          ?.length //coverage:ignore-line
-                    : ((data.users?.length ?? 0) + 1),
-                padding: EdgeInsets.all(Dimens.space16),
-                itemBuilder: (_, index) => index < (data.users?.length ?? 0)
-                    ? _DashboardUserItem(user: data.users![index])
-                    : Padding(
-                        padding: EdgeInsets.all(Dimens.space16),
-                        child: Center(
-                          child: CupertinoActivityIndicator(
-                            color: ColorScheme.of(context).primary,
-                          ),
-                        ),
-                      ),
-              ),
-              UsersStateFailure(:final message) => _DashboardEmpty(
-                message: message,
-              ),
-              UsersStateEmpty() => const _DashboardEmpty(),
-            },
-          ),
+    child: BlocBuilder<UsersCubit, UsersState>(
+      builder: (_, state) => AnimatedSwitcher(
+        duration: Motion.medium,
+        switchInCurve: Motion.emphasized,
+        switchOutCurve: Motion.standard,
+        child: KeyedSubtree(
+          key: ValueKey(state is UsersStateLoading),
+          child: switch (state) {
+            UsersStateLoading() => const _DashboardLoading(),
+            UsersStateInitial() => const SizedBox.shrink(),
+            UsersStateSuccess(:final data) => PaginatedListView<User>(
+              items: data.users ?? [],
+              hasMore: data.currentPage != data.lastPage,
+              onRefresh: () => context.read<UsersCubit>().refresh(),
+              onLoadMore: () => context.read<UsersCubit>().nextPage(),
+              emptyWidget: const _DashboardEmpty(),
+              itemBuilder: (_, user, _) => _DashboardUserItem(user: user),
+            ),
+            UsersStateFailure(:final message) => AppErrorView(
+              message: message,
+              onRetry: () => context.read<UsersCubit>().refresh(),
+            ),
+            UsersStateEmpty() => const _DashboardEmpty(),
+          },
         ),
       ),
     ),

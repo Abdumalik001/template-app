@@ -1,5 +1,5 @@
-import 'package:cactus_hr/core/core.dart';
 import 'package:dartz/dartz.dart';
+import 'package:template_app/core/core.dart';
 
 abstract class UseCase<Result, Params> {
   Future<Either<Failure, Result>> call(Params params);

@@ -53,10 +53,11 @@ class _MenuDrawerItem extends StatelessWidget {
                   Expanded(
                     child: AnimatedDefaultTextStyle(
                       duration: Motion.medium,
-                      style: (isSelected
-                              ? TextTheme.of(context).bodyLarge500
-                              : TextTheme.of(context).bodyLarge)
-                          ?.copyWith(color: foreground) ??
+                      style:
+                          (isSelected
+                                  ? TextTheme.of(context).bodyLarge500
+                                  : TextTheme.of(context).bodyLarge)
+                              ?.copyWith(color: foreground) ??
                           const TextStyle(),
                       child: Text(item.localizedTitle(context)),
                     ),

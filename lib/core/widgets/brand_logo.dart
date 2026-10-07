@@ -1,5 +1,5 @@
-import 'package:cactus_hr/core/core.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:template_app/core/core.dart';
 
 /// App logo tinted with the primary colour so it follows light/dark theme.
 class BrandLogo extends StatelessWidget {

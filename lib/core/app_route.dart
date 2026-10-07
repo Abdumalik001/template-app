@@ -1,10 +1,9 @@
-import 'package:cactus_hr/core/dependencies_injection.dart';
-import 'package:cactus_hr/features/features.dart';
-import 'package:cactus_hr/utils/utils.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_ui/material_ui.dart';
+import 'package:template_app/core/dependencies_injection.dart';
+import 'package:template_app/features/features.dart';
 
 enum Routes {
   root('/'),
@@ -23,20 +22,21 @@ enum Routes {
   final String path;
 }
 
-class AppRoute {
+class AppRouter {
   static late BuildContext context;
   static late bool isUnitTest;
 
-  AppRoute.setStream(BuildContext ctx, {bool isTest = false}) {
+  AppRouter.setStream(BuildContext ctx, {bool isTest = false}) {
     context = ctx;
     isUnitTest = isTest;
   }
 
   static final GoRouter router = GoRouter(
     routes: [
-      GoRoute(
+      AppRoute(
         path: Routes.splashScreen.path,
         name: Routes.splashScreen.name,
+        useFade: true,
         builder: (_, _) => const SplashScreenPage(),
       ),
       GoRoute(
@@ -44,12 +44,13 @@ class AppRoute {
         name: Routes.root.name,
         redirect: (_, _) => Routes.dashboard.path,
       ),
-      GoRoute(
+      AppRoute(
         path: Routes.login.path,
         name: Routes.login.name,
+        useFade: true,
         builder: (_, _) => const LoginPage(),
       ),
-      GoRoute(
+      AppRoute(
         path: Routes.register.path,
         name: Routes.register.name,
         builder: (_, _) => MultiBlocProvider(
@@ -57,15 +58,19 @@ class AppRoute {
           child: const RegisterPage(),
         ),
       ),
-      GoRoute(
+      AppRoute(
         path: Routes.dashboard.path,
         name: Routes.dashboard.name,
-        builder: (_, _) => BlocProvider(
-          create: (_) => sl<UsersCubit>()..fetchUsers(const UsersParams()),
-          child: const DashboardPage(),
-        ),
+        useFade: true,
+        builder: (_, _) {
+          sl<UserCubit>().getUser();
+          return BlocProvider(
+            create: (_) => sl<UsersCubit>()..fetchUsers(const UsersParams()),
+            child: const DashboardPage(),
+          );
+        },
       ),
-      GoRoute(
+      AppRoute(
         path: Routes.settings.path,
         name: Routes.settings.name,
         builder: (_, _) => const SettingsPage(),
@@ -74,38 +79,38 @@ class AppRoute {
     initialLocation: Routes.splashScreen.path,
     routerNeglect: true,
     debugLogDiagnostics: kDebugMode,
-    refreshListenable: isUnitTest
-        ? null
-        //coverage:ignore-start
-        : GoRouterRefreshStream([
-            context.read<AuthCubit>().stream,
-            context.read<LogoutCubit>().stream,
-          ]),
-    //coverage:ignore-end
-    redirect: (_, GoRouterState state) {
-      final bool isAllowedPages =
-          state.matchedLocation == Routes.login.path ||
-          state.matchedLocation == Routes.register.path ||
-          state.matchedLocation == Routes.splashScreen.path;
-
-      final bool isLoggedIn = sl.isRegistered<AppStorageContract>() &&
-          (sl<AppStorageContract>().getPref<bool>(PrefKey.isLogin) ?? false);
-
-      ///  Check if not login
-      ///  if current page is login page we don't need to direct user
-      ///  but if not we must direct user to login page
-      if (!isLoggedIn) {
-        return isAllowedPages ? null : Routes.login.path; //coverage:ignore-line
-      }
-
-      /// Check if already login and in login page
-      /// we should direct user to main page
-      if (isAllowedPages && isLoggedIn) {
-        return Routes.root.path;
-      }
-
-      /// No direct
-      return null;
-    },
   );
+
+  static void logout() {
+    router.goNamed(Routes.splashScreen.name);
+  }
+}
+
+/// Custom [GoRoute] that supports smooth transitions (e.g. fade) or standard iOS/Cupertino style.
+class AppRoute extends GoRoute {
+  final bool useFade;
+
+  AppRoute({
+    required super.path,
+    required super.name,
+    required Widget Function(BuildContext context, GoRouterState s) builder,
+    List<GoRoute> routes = const [],
+    this.useFade = false,
+    super.redirect,
+  }) : super(
+         routes: routes,
+         pageBuilder: (context, state) {
+           final pageContent = builder(context, state);
+           if (useFade) {
+             return CustomTransitionPage<void>(
+               key: state.pageKey,
+               child: pageContent,
+               transitionsBuilder:
+                   (context, animation, secondaryAnimation, child) =>
+                       FadeTransition(opacity: animation, child: child),
+             );
+           }
+           return CupertinoPage<void>(key: state.pageKey, child: pageContent);
+         },
+       );
 }

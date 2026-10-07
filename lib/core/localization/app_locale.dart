@@ -1,5 +1,5 @@
-import 'package:cactus_hr/core/localization/generated/strings.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:template_app/core/localization/generated/strings.dart';
 
 class AppLocale {
   AppLocale._();

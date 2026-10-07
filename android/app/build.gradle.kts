@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.lazycatlabs.auth"
+    namespace = "com.template.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -17,7 +17,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.lazycatlabs.auth"
+        applicationId = "com.template.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

@@ -1,8 +1,8 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/utils/utils.dart';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/utils/utils.dart';
 
 extension StringExtension on String {
   bool isValidEmail() => RegExp(

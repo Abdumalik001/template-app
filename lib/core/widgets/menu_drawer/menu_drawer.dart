@@ -1,27 +1,18 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/features/features.dart';
-import 'package:cactus_hr/utils/utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/features/features.dart';
+import 'package:template_app/utils/utils.dart';
 
 part 'menu_drawer_header.dart';
 part 'menu_drawer_item.dart';
 
 enum AppMenuItem {
-  dashboard(
-    route: Routes.dashboard,
-    icon: Icons.space_dashboard_outlined,
-  ),
-  settings(
-    route: Routes.settings,
-    icon: Icons.tune_rounded,
-  ),
-  logout(
-    route: null,
-    icon: Icons.logout_rounded,
-  );
+  dashboard(route: Routes.dashboard, icon: Icons.space_dashboard_outlined),
+  settings(route: Routes.settings, icon: Icons.tune_rounded),
+  logout(route: null, icon: Icons.logout_rounded);
 
   const AppMenuItem({required this.route, required this.icon});
 
@@ -49,31 +40,28 @@ class MenuDrawer extends StatelessWidget {
           children: [
             Padding(
               padding: EdgeInsets.all(Dimens.space24),
-              child: BlocProvider(
-                create: (_) => sl<UserCubit>()..getUser(),
-                child: BlocBuilder<UserCubit, UserState>(
-                  builder: (_, state) => AnimatedSwitcher(
-                    duration: Motion.medium,
-                    child: switch (state) {
-                      UserStateLoading() => const Skeletonizer(
-                        child: _MenuDrawerHeader(
-                          user: User(
-                            name: 'Placeholder Name',
-                            email: 'placeholder@mail.com',
-                          ),
+              child: BlocBuilder<UserCubit, UserState>(
+                builder: (_, state) => AnimatedSwitcher(
+                  duration: Motion.medium,
+                  child: switch (state) {
+                    UserStateLoading() => const Skeletonizer(
+                      child: _MenuDrawerHeader(
+                        user: User(
+                          name: 'Placeholder Name',
+                          email: 'placeholder@mail.com',
                         ),
                       ),
-                      UserStateFailure(:final message) => Text(
-                        message,
-                        style: TextTheme.of(context).bodyMedium?.copyWith(
-                          color: ColorScheme.of(context).error,
-                        ),
+                    ),
+                    UserStateFailure(:final message) => Text(
+                      message,
+                      style: TextTheme.of(context).bodyMedium?.copyWith(
+                        color: ColorScheme.of(context).error,
                       ),
-                      UserStateSuccess(:final data) => _MenuDrawerHeader(
-                        user: data,
-                      ),
-                    },
-                  ),
+                    ),
+                    UserStateSuccess(:final data) => _MenuDrawerHeader(
+                      user: data,
+                    ),
+                  },
                 ),
               ),
             ),
@@ -88,7 +76,8 @@ class MenuDrawer extends StatelessWidget {
                       offset: Dimens.space12,
                       child: _MenuDrawerItem(
                         item: item,
-                        isSelected: item.route != null &&
+                        isSelected:
+                            item.route != null &&
                             currentRoute == item.route!.path,
                         onTap: () => _handleItemTap(context, item),
                       ),
@@ -119,50 +108,61 @@ class MenuDrawer extends StatelessWidget {
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (dialogCtx) => AlertDialog(
-        icon: Icon(
-          Icons.logout_rounded,
-          color: ColorScheme.of(dialogCtx).error,
-        ),
-        title: Text(Strings.of(dialogCtx)!.logout),
-        content: Text(Strings.of(dialogCtx)!.logoutDesc),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogCtx).pop(),
-            child: Text(
-              Strings.of(dialogCtx)!.cancel,
-              style: TextTheme.of(dialogCtx).bodyMedium600?.copyWith(
-                color: ColorScheme.of(dialogCtx).onSurfaceVariant,
-              ),
-            ),
-          ),
-          BlocListener<LogoutCubit, LogoutState>(
-            listener: (listenerCtx, state) => switch (state) {
-              LogoutStateLoading() => listenerCtx.show(),
-              LogoutStateFailure(:final message) => (() {
-                listenerCtx.dismiss();
-                message.toToastError();
-              })(),
-              LogoutStateSuccess(:final message) => (() {
-                listenerCtx.dismiss();
-                message.toToastSuccess();
-                context.goNamed(Routes.root.name);
-              })(),
-            },
-            child: TextButton(
-              onPressed: () {
-                Navigator.of(dialogCtx).pop();
-                context.read<LogoutCubit>().postLogout();
-              },
-              child: Text(
-                Strings.of(dialogCtx)!.yes,
-                style: TextTheme.of(dialogCtx).bodyMedium600?.copyWith(
-                  color: ColorScheme.of(dialogCtx).error,
+      builder: (dialogCtx) => BlocProvider(
+        create: (_) => sl<LogoutCubit>(),
+        child: BlocConsumer<LogoutCubit, LogoutState>(
+          listener: (ctx, state) => switch (state) {
+            LogoutStateInitial() => null,
+            LogoutStateLoading() => null,
+            LogoutStateFailure(:final message) => (() {
+              message.toToastError();
+            })(),
+            LogoutStateSuccess() => (() async {
+              Navigator.of(dialogCtx).pop();
+              sl<UserCubit>().clearCache();
+              await sl<AppStorageContract>().clearSession();
+              AppRouter.logout();
+            })(),
+          },
+          builder: (ctx, state) => AlertDialog(
+            icon: Icon(Icons.logout_rounded, color: ColorScheme.of(ctx).error),
+            title: Text(Strings.of(ctx)!.logout),
+            content: Text(Strings.of(ctx)!.logoutDesc),
+            actions: [
+              TextButton(
+                onPressed: state is LogoutStateLoading
+                    ? null
+                    : () => Navigator.of(dialogCtx).pop(),
+                child: Text(
+                  Strings.of(ctx)!.cancel,
+                  style: TextTheme.of(ctx).bodyMedium600?.copyWith(
+                    color: ColorScheme.of(ctx).onSurfaceVariant,
+                  ),
                 ),
               ),
-            ),
+              TextButton(
+                onPressed: state is LogoutStateLoading
+                    ? null
+                    : () => ctx.read<LogoutCubit>().postLogout(),
+                child: state is LogoutStateLoading
+                    ? SizedBox(
+                        width: Dimens.space16,
+                        height: Dimens.space16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: ColorScheme.of(ctx).error,
+                        ),
+                      )
+                    : Text(
+                        Strings.of(ctx)!.yes,
+                        style: TextTheme.of(ctx).bodyMedium600?.copyWith(
+                          color: ColorScheme.of(ctx).error,
+                        ),
+                      ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

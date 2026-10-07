@@ -1,5 +1,5 @@
-import 'package:cactus_hr/core/core.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:template_app/core/core.dart';
 
 /// Blocking progress indicator used by the loading dialog. Content areas
 /// use skeletons (`Skeletonizer`) instead.

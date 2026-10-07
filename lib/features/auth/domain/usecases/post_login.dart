@@ -1,8 +1,8 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/features/features.dart';
-import 'package:cactus_hr/utils/utils.dart';
 import 'package:dartz/dartz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/features/features.dart';
+import 'package:template_app/utils/utils.dart';
 
 part 'post_login.freezed.dart';
 part 'post_login.g.dart';
@@ -12,7 +12,7 @@ class PostLogin extends UseCase<Login, LoginParams> {
   final AppStorageContract _storage;
 
   PostLogin(this._repo, [AppStorageContract? storage])
-      : _storage = storage ?? sl<AppStorageContract>();
+    : _storage = storage ?? sl<AppStorageContract>();
 
   @override
   Future<Either<Failure, Login>> call(LoginParams params) async {

@@ -39,5 +39,11 @@
   "loginSubtitle": "Sign in to continue to your account",
   "createAccount": "Create account",
   "registerSubtitle": "It only takes a minute to get started",
-  "loginSuccess": "Login successful"
+  "loginSuccess": "Login successful",
+  "errorNetwork": "No internet connection. Please check your network and try again.",
+  "errorTimeout": "Connection timed out. Please try again later.",
+  "errorUnauthorized": "Session expired. Please log in again.",
+  "errorServer": "Server error. Please try again later.",
+  "errorUnknown": "Something went wrong. Please try again.",
+  "retry": "Try again"
 }

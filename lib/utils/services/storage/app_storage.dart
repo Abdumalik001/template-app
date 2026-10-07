@@ -34,6 +34,12 @@ abstract interface class AppStorageContract {
 
   String? get fcm;
 
+  Stream<String> get listenerStream;
+
+  Stream<bool> get isLoggedInStream;
+
+  bool get isLoggedIn;
+
   Future<void> saveTokens({required String access, required String refresh});
 
   Future<void> saveFcmToken(String fcmToken);
@@ -42,10 +48,13 @@ abstract interface class AppStorageContract {
 }
 
 class AppStorage implements AppStorageContract {
-  AppStorage([FlutterSecureStorage? secure]) : _secure = secure ?? const FlutterSecureStorage();
+  AppStorage([FlutterSecureStorage? secure])
+    : _secure = secure ?? const FlutterSecureStorage();
 
   final FlutterSecureStorage _secure;
   late final Box<dynamic> _box;
+  final StreamController<String> _listener =
+      StreamController<String>.broadcast();
 
   String? _tokenCache;
   String? _fcmCache;
@@ -53,9 +62,20 @@ class AppStorage implements AppStorageContract {
   Box<dynamic> get box => _box;
 
   @override
+  Stream<String> get listenerStream => _listener.stream;
+
+  @override
+  Stream<bool> get isLoggedInStream => _listener.stream
+      .where((key) => key == PrefKey.isLogin.name)
+      .map((_) => isLoggedIn);
+
+  @override
+  bool get isLoggedIn => getPref<bool>(PrefKey.isLogin) ?? false;
+
+  @override
   Future<void> init(String prefix) async {
     await Hive.initFlutter();
-    _box = await Hive.openBox('${prefix}cactus_hr');
+    _box = await Hive.openBox('${prefix}template_app');
 
     // 1. iOS reinstall va yangi o'rnatilish holati
     if (_box.get(PrefKey.isFirstInstall.name) == null) {
@@ -96,10 +116,16 @@ class AppStorage implements AppStorageContract {
   }
 
   @override
-  Future<void> setPref<T>(PrefKey key, T value) => _box.put(key.name, value);
+  Future<void> setPref<T>(PrefKey key, T value) async {
+    await _box.put(key.name, value);
+    _listener.add(key.name);
+  }
 
   @override
-  Future<void> removePref(PrefKey key) => _box.delete(key.name);
+  Future<void> removePref(PrefKey key) async {
+    await _box.delete(key.name);
+    _listener.add(key.name);
+  }
 
   // --- Secure Storage (Keystore / Keychain) ---
 
@@ -124,7 +150,10 @@ class AppStorage implements AppStorageContract {
   String? get fcm => _fcmCache;
 
   @override
-  Future<void> saveTokens({required String access, required String refresh}) async {
+  Future<void> saveTokens({
+    required String access,
+    required String refresh,
+  }) async {
     _tokenCache = access;
     try {
       await Future.wait([

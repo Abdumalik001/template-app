@@ -1,6 +1,6 @@
-import 'package:cactus_hr/features/general/general.dart';
-import 'package:cactus_hr/features/users/data/models/users_response.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:template_app/features/general/general.dart';
+import 'package:template_app/features/users/data/models/users_response.dart';
 
 part 'user_response.freezed.dart';
 part 'user_response.g.dart';

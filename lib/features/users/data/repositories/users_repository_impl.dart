@@ -1,6 +1,6 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/features/users/users.dart';
 import 'package:dartz/dartz.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/features/users/users.dart';
 
 class UsersRepositoryImpl implements UsersRepository {
   /// Data Source
@@ -12,10 +12,11 @@ class UsersRepositoryImpl implements UsersRepository {
   Future<Either<Failure, Users>> users(UsersParams usersParams) async {
     final response = await usersRemoteDatasource.users(usersParams);
 
-    return response.fold<Either<Failure, Users>>((failure) => Left(failure),
-        (usersResponse) {
+    return response.fold<Either<Failure, Users>>((failure) => Left(failure), (
+      usersResponse,
+    ) {
       if (usersResponse.data?.isEmpty ?? true) {
-        return Left(NoDataFailure()); //coverage:ignore-line
+        return const Left(NoDataFailure()); //coverage:ignore-line
       }
       return Right(
         Users(
@@ -41,10 +42,11 @@ class UsersRepositoryImpl implements UsersRepository {
   Future<Either<Failure, User>> user() async {
     final response = await usersRemoteDatasource.user();
 
-    return response.fold<Either<Failure, User>>((failure) => Left(failure),
-        (userResponse) {
+    return response.fold<Either<Failure, User>>((failure) => Left(failure), (
+      userResponse,
+    ) {
       if (userResponse.data == null) {
-        return Left(NoDataFailure());
+        return const Left(NoDataFailure());
       }
       return Right(
         User(

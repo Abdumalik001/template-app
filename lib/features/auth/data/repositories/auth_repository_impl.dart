@@ -1,6 +1,6 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/features/auth/auth.dart';
 import 'package:dartz/dartz.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/features/auth/auth.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   /// Data Source
@@ -11,10 +11,11 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, Login>> login(LoginParams params) async {
     final response = await authRemoteDatasource.login(params);
 
-    return response.fold<Either<Failure, Login>>((failure) => Left(failure),
-        (loginResponse) {
+    return response.fold<Either<Failure, Login>>((failure) => Left(failure), (
+      loginResponse,
+    ) {
       if (loginResponse.data == null) {
-        return Left(NoDataFailure());
+        return const Left(NoDataFailure());
       }
       return Right(
         Login(

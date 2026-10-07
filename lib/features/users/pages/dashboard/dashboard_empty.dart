@@ -1,11 +1,8 @@
 part of 'dashboard_page.dart';
 
 class _DashboardEmpty extends StatelessWidget {
-  const _DashboardEmpty({this.message});
-
-  final String? message;
+  const _DashboardEmpty();
 
   @override
-  Widget build(BuildContext context) =>
-      Center(child: Empty(errorMessage: message));
+  Widget build(BuildContext context) => const Center(child: Empty());
 }

@@ -1,7 +1,7 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/features/features.dart';
 import 'package:dartz/dartz.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/features/features.dart';
 
 part 'post_register.freezed.dart';
 part 'post_register.g.dart';

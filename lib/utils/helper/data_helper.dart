@@ -1,6 +1,6 @@
-import 'package:cactus_hr/utils/utils.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:template_app/utils/utils.dart';
 
 part 'data_helper.freezed.dart';
 

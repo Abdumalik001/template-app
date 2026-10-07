@@ -1,5 +1,5 @@
-import 'package:cactus_hr/features/general/general.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:template_app/features/general/general.dart';
 
 part 'diagnostic_response.freezed.dart';
 part 'diagnostic_response.g.dart';

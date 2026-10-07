@@ -1,7 +1,7 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/features/features.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/features/features.dart';
 
 part 'users_cubit.freezed.dart';
 
@@ -13,6 +13,15 @@ class UsersCubit extends Cubit<UsersState> {
   final List<User> users = [];
 
   final GetUsers _getUser;
+
+  void clearCache() {
+    users.clear();
+    currentPage = 1;
+    lastPage = 1;
+    if (!isClosed) {
+      emit(const UsersStateLoading());
+    }
+  }
 
   Future<void> refresh() async {
     /// reset data
@@ -34,32 +43,42 @@ class UsersCubit extends Cubit<UsersState> {
   }
 
   Future<void> fetchUsers(UsersParams usersParams, {bool force = false}) async {
+    if (isClosed) {
+      return;
+    }
     if (currentPage == 1 && users.isEmpty) {
       emit(const UsersStateLoading());
     } else if (users.isNotEmpty && !force) {
       // If already loaded and not forced, ensure current state is success
-      emit(
-        UsersStateSuccess(
-          Users(
-            currentPage: currentPage,
-            lastPage: lastPage,
-            users: users,
+      if (!isClosed) {
+        emit(
+          UsersStateSuccess(
+            Users(currentPage: currentPage, lastPage: lastPage, users: users),
           ),
-        ),
-      );
+        );
+      }
       return;
     }
 
     final data = await _getUser.call(usersParams);
+    if (isClosed) {
+      return;
+    }
     data.fold(
       (l) {
-        if (l is ServerFailure) {
-          emit(UsersStateFailure(l.message ?? ''));
-        } else if (l is NoDataFailure) {
+        if (isClosed) {
+          return;
+        }
+        if (l is NoDataFailure) {
           emit(const UsersStateEmpty());
+        } else {
+          emit(UsersStateFailure(l.displayMessage));
         }
       },
       (r) {
+        if (isClosed) {
+          return;
+        }
         users.addAll(r.users ?? []);
         currentPage = r.currentPage ?? 1;
         lastPage = r.lastPage ?? 1;
@@ -73,7 +92,9 @@ class UsersCubit extends Cubit<UsersState> {
         if (currentPage != 1) {
           emit(const UsersStateInitial());
         }
-        emit(UsersStateSuccess(updatedUsers));
+        if (!isClosed) {
+          emit(UsersStateSuccess(updatedUsers));
+        }
       },
     );
   }

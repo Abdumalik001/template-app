@@ -1,9 +1,9 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/features/features.dart';
-import 'package:cactus_hr/utils/utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/features/features.dart';
+import 'package:template_app/utils/utils.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -45,10 +45,7 @@ class _SettingsPageState extends State<SettingsPage> {
       centerTitle: true,
       title: Text(Strings.of(context)!.settings),
       leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios_new_rounded,
-          size: Dimens.space20,
-        ),
+        icon: Icon(Icons.arrow_back_ios_new_rounded, size: Dimens.space20),
         onPressed: () {
           if (context.canPop()) {
             context.pop();

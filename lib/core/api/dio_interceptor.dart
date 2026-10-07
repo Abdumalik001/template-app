@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/features/auth/auth.dart';
-import 'package:cactus_hr/utils/utils.dart';
 import 'package:dio/dio.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/features/auth/auth.dart';
+import 'package:template_app/utils/utils.dart';
 
 // coverage:ignore-start
 class DioInterceptor extends Interceptor with FirebaseCrashLogger {
@@ -22,12 +22,24 @@ class DioInterceptor extends Interceptor with FirebaseCrashLogger {
     this._onLogout,
     String Function()? deviceInfo,
     AppStorageContract? storage,
-  })  : _dioFactory = dioFactory ?? (() => DioClient().dio),
-        _deviceInfo = deviceInfo ?? (() => Platform.localHostname),
-        _storage = storage ?? sl<AppStorageContract>();
+  }) : _dioFactory = dioFactory ?? (() => DioClient().dio),
+       _deviceInfo = deviceInfo ?? (() => Platform.localHostname),
+       _storage = storage ?? sl<AppStorageContract>();
+
+  static const requireAuthKey = 'requireAuth';
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    final requireAuth = options.extra[requireAuthKey] as bool? ?? true;
+    if (requireAuth) {
+      final token = _storage.token;
+      if (token != null && token.isNotEmpty) {
+        options.headers['Authorization'] = token;
+      }
+    } else {
+      options.headers.remove('Authorization');
+    }
+
     String headerMessage = '';
     options.headers.forEach((k, v) => headerMessage += '► $k: $v\n');
 
@@ -53,7 +65,10 @@ class DioInterceptor extends Interceptor with FirebaseCrashLogger {
   }
 
   @override
-  Future<void> onError(DioException dioException, ErrorInterceptorHandler handler) async {
+  Future<void> onError(
+    DioException dioException,
+    ErrorInterceptorHandler handler,
+  ) async {
     log.e(
       "<-- ${dioException.message} ${dioException.response?.requestOptions != null ? (dioException.response!.requestOptions.baseUrl + dioException.response!.requestOptions.path) : 'URL'}\n\n"
       "${dioException.response != null ? dioException.response!.data : 'Unknown Error'}",
@@ -110,11 +125,8 @@ class DioInterceptor extends Interceptor with FirebaseCrashLogger {
           'refreshToken': refreshToken,
           'deviceInfo': _deviceInfo(),
           'fcmToken': _storage.fcm ?? 'GeneratedFCMToken',
-          'loginType': 'email',
         },
-        options: Options(
-          extra: const {_skipRefreshKey: true},
-        ),
+        options: Options(extra: const {_skipRefreshKey: true}),
       );
 
       if ((response.statusCode ?? 0) < 200 ||
@@ -123,8 +135,12 @@ class DioInterceptor extends Interceptor with FirebaseCrashLogger {
         return false;
       }
 
-      final data = LoginResponse.fromJson(response.data as Map<String, dynamic>).data;
-      if (data?.token == null || data?.refreshToken == null || data?.tokenType == null) {
+      final data = LoginResponse.fromJson(
+        response.data as Map<String, dynamic>,
+      ).data;
+      if (data?.token == null ||
+          data?.refreshToken == null ||
+          data?.tokenType == null) {
         return false;
       }
 
@@ -139,7 +155,9 @@ class DioInterceptor extends Interceptor with FirebaseCrashLogger {
     }
   }
 
-  Future<Response<dynamic>?> _refreshAndRetry(RequestOptions requestOptions) async {
+  Future<Response<dynamic>?> _refreshAndRetry(
+    RequestOptions requestOptions,
+  ) async {
     if (!_canRefresh(requestOptions)) {
       return null;
     }
@@ -168,8 +186,7 @@ class DioInterceptor extends Interceptor with FirebaseCrashLogger {
         .firstOrNull
         ?.value
         .toString();
-    return authorization != null &&
-        (_storage.token?.isNotEmpty ?? false);
+    return authorization != null && (_storage.token?.isNotEmpty ?? false);
   }
 
   Future<bool> _refreshOnce() async {

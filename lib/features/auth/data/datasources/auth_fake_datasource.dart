@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/features/auth/auth.dart';
-import 'package:cactus_hr/features/general/general.dart';
 import 'package:dartz/dartz.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/features/auth/auth.dart';
+import 'package:template_app/features/general/general.dart';
 
 class AuthFakeDatasource implements AuthRemoteDatasource {
   const AuthFakeDatasource();
@@ -14,11 +14,15 @@ class AuthFakeDatasource implements AuthRemoteDatasource {
     await Future.delayed(const Duration(milliseconds: 600));
 
     final token = 'fake_jwt_token_${DateTime.now().millisecondsSinceEpoch}';
-    final refreshToken = 'fake_refresh_token_${DateTime.now().millisecondsSinceEpoch}';
+    final refreshToken =
+        'fake_refresh_token_${DateTime.now().millisecondsSinceEpoch}';
 
     return Right(
       LoginResponse(
-        diagnostic: const Diagnostic(status: '200', message: 'Login successful'),
+        diagnostic: const Diagnostic(
+          status: '200',
+          message: 'Login successful',
+        ),
         data: DataLogin(
           token: token,
           tokenType: 'Bearer',
@@ -29,7 +33,9 @@ class AuthFakeDatasource implements AuthRemoteDatasource {
   }
 
   @override
-  Future<Either<Failure, RegisterResponse>> register(RegisterParams params) async {
+  Future<Either<Failure, RegisterResponse>> register(
+    RegisterParams params,
+  ) async {
     // Simulate network latency
     await Future.delayed(const Duration(milliseconds: 600));
 

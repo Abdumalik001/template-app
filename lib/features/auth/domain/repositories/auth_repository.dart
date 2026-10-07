@@ -1,6 +1,6 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/features/auth/auth.dart';
 import 'package:dartz/dartz.dart';
+import 'package:template_app/core/core.dart';
+import 'package:template_app/features/auth/auth.dart';
 
 abstract class AuthRepository {
   Future<Either<Failure, Login>> login(LoginParams params);

@@ -1,7 +1,6 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/features/features.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:template_app/features/features.dart';
 
 part 'register_cubit.freezed.dart';
 
@@ -14,8 +13,7 @@ class RegisterCubit extends Cubit<RegisterState> {
     emit(const RegisterStateLoading());
     final data = await _postRegister.call(params);
     data.fold(
-      (l) =>
-          emit(RegisterStateFailure(l is ServerFailure ? l.message ?? '' : '')),
+      (l) => emit(RegisterStateFailure(l.displayMessage)),
       (r) => emit(RegisterStateSuccess(r)),
     );
   }

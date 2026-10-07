@@ -28,6 +28,7 @@ class Dimens {
   static double get space8 => 8.w;
   static double get space12 => 12.w;
   static double get space16 => 16.w;
+  static double get space18 => 18.w;
   static double get space20 => 20.w;
   static double get space24 => 24.w;
   static double get space30 => 30.w;

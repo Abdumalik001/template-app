@@ -1,5 +1,6 @@
 export 'api/api.dart';
 export 'app_route.dart';
+export 'bloc/main_cubit.dart';
 export 'dependencies_injection.dart';
 export 'error/error.dart';
 export 'localization/localization.dart';

@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cactus_hr/core/core.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:template_app/core/core.dart';
 
 class CircleImage extends StatelessWidget {
   final String url;

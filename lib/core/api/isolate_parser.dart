@@ -1,6 +1,6 @@
 import 'dart:isolate';
 
-import 'package:cactus_hr/core/core.dart';
+import 'package:template_app/core/core.dart';
 
 class IsolateParser<T> {
   final Map<String, dynamic> json;

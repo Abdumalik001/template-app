@@ -1,7 +1,8 @@
-import 'package:cactus_hr/core/core.dart';
-import 'package:cactus_hr/utils/utils.dart';
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:template_app/core/resources/resources.dart';
+import 'package:template_app/core/widgets/spacer_v.dart';
+import 'package:template_app/utils/utils.dart';
 
 class TextF extends StatefulWidget {
   const TextF({
@@ -12,6 +13,7 @@ class TextF extends StatefulWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.obscureText,
+    this.isPassword = false,
     this.textInputType,
     this.inputFormatters,
     this.enabled = true,
@@ -39,6 +41,9 @@ class TextF extends StatefulWidget {
   final Widget? suffixIcon;
   final Widget? prefixIcon;
   final bool? obscureText;
+
+  /// Automatically shows eye toggle button for passwords
+  final bool isPassword;
   final bool enabled;
   final TextInputType? textInputType;
   final TextInputAction? textInputAction;
@@ -65,6 +70,22 @@ class TextF extends StatefulWidget {
 
 class TextFState extends State<TextF> {
   final _debouncer = Debouncer();
+  late bool _obscure;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscure = widget.isPassword || (widget.obscureText ?? false);
+  }
+
+  @override
+  void didUpdateWidget(covariant TextF oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.obscureText != widget.obscureText ||
+        oldWidget.isPassword != widget.isPassword) {
+      _obscure = widget.isPassword || (widget.obscureText ?? false);
+    }
+  }
 
   @override
   void dispose() {
@@ -100,50 +121,71 @@ class TextFState extends State<TextF> {
     ),
   );
 
-  Widget get _textFormField => Semantics(
-    label: widget.semantic,
-    child: TextFormField(
-      key: widget.formFieldKey,
-      autofillHints: widget.autoFillHints,
-      textInputAction: widget.textInputAction,
-      onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
-      enabled: widget.enabled,
-      inputFormatters: widget.inputFormatters,
-      keyboardType: widget.textInputType,
-      controller: widget.controller,
-      obscureText: widget.obscureText ?? false,
-      focusNode: widget.focusNode,
-      maxLines: widget.maxLines,
-      onTap: widget.onTap,
-      textAlignVertical: TextAlignVertical.center,
-      style: widget.textStyle ?? TextTheme.of(context).bodyLarge,
-      decoration: InputDecoration(
-        fillColor: widget.backgroundColor,
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: Dimens.space16,
-          vertical: Dimens.space16,
+  Widget get _textFormField {
+    Widget? effectiveSuffix = widget.suffixIcon;
+
+    if (widget.isPassword) {
+      effectiveSuffix = IconButton(
+        icon: Icon(
+          _obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+          size: Dimens.space20,
+          color: ColorScheme.of(context).onSurfaceVariant,
         ),
-        prefixIcon: widget.prefixIcon,
-        suffixIcon: widget.suffixIcon == null
-            ? null
-            : Padding(
-                padding: EdgeInsets.symmetric(horizontal: Dimens.space12),
-                child: Center(
-                  widthFactor: 1,
-                  heightFactor: 1,
-                  child: widget.suffixIcon,
+        onPressed: () {
+          setState(() {
+            _obscure = !_obscure;
+          });
+        },
+      );
+    }
+
+    return Semantics(
+      label: widget.semantic,
+      child: TextFormField(
+        key: widget.formFieldKey,
+        autofillHints: widget.autoFillHints,
+        textInputAction: widget.textInputAction,
+        onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
+        enabled: widget.enabled,
+        inputFormatters: widget.inputFormatters,
+        keyboardType: widget.isPassword
+            ? TextInputType.visiblePassword
+            : widget.textInputType,
+        controller: widget.controller,
+        obscureText: _obscure,
+        focusNode: widget.focusNode,
+        maxLines: widget.maxLines,
+        onTap: widget.onTap,
+        textAlignVertical: TextAlignVertical.center,
+        style: widget.textStyle ?? TextTheme.of(context).bodyLarge,
+        decoration: InputDecoration(
+          fillColor: widget.backgroundColor,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: Dimens.space16,
+            vertical: Dimens.space16,
+          ),
+          prefixIcon: widget.prefixIcon,
+          suffixIcon: effectiveSuffix == null
+              ? null
+              : Padding(
+                  padding: EdgeInsets.symmetric(horizontal: Dimens.space12),
+                  child: Center(
+                    widthFactor: 1,
+                    heightFactor: 1,
+                    child: effectiveSuffix,
+                  ),
                 ),
-              ),
-        suffixIconConstraints: const BoxConstraints(),
-        hintText: widget.hint,
-        floatingLabelBehavior: widget.hint != null
-            ? FloatingLabelBehavior.always
-            : null,
+          suffixIconConstraints: const BoxConstraints(),
+          hintText: widget.hint,
+          floatingLabelBehavior: widget.hint != null
+              ? FloatingLabelBehavior.always
+              : null,
+        ),
+        validator: widget.validator,
+        onChanged: (String value) =>
+            _debouncer.run(() => widget.onChange?.call(value)),
+        onSaved: widget.onSaved,
       ),
-      validator: widget.validator,
-      onChanged: (String value) =>
-          _debouncer.run(() => widget.onChange?.call(value)),
-      onSaved: widget.onSaved,
-    ),
-  );
+    );
+  }
 }

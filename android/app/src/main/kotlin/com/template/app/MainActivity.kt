@@ -1,4 +1,4 @@
-package com.lazycatlabs.auth
+package com.template.app
 
 import android.os.Build
 import android.os.Bundle
