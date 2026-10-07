@@ -16,17 +16,17 @@ any project on this stack.
 
 | Item               | Value                                                                                           |
 |--------------------|-------------------------------------------------------------------------------------------------|
-| App / package name | `template_app` — imports use `package:template_app/...`                                     |
-| Version            | `<version+build from pubspec.yaml>`                                                             |
-| Dart SDK           | `<constraint from pubspec.yaml>`                                                                |
-| Flavors            | `<e.g. stg, prd — or "none">`                                                                   |
-| Env / config       | `<e.g. --dart-define-from-file .env.<flavor>.json, flutter_dotenv, or hardcoded>`               |
-| Reference feature  | `<lib/features/<the most complete feature>>` — features: `<list>`                               |
-| Localization       | `<languages; ARB template path; generated class name>`                                          |
-| Backend clients    | `<base URLs and the client class that owns each — see §6>`                                      |
-| Functional types   | `<either_dart or dartz — pick one, never both>`                                                 |
-| Branch / PR title  | `<branch "<type>/<ticket-id>_<slug>" → PR title "<type>: <ticket-id> <description>" — see §10>` |
-| CI                 | `<the exact commands CI runs>`                                                                  |
+| App / package name | `template_app` — imports use `package:template_app/...`                                         |
+| Version            | `1.0.0+1` from `pubspec.yaml`                                                                   |
+| Dart SDK           | SDK `^3.12.0`, Flutter `>=3.44.0` (managed via `fvm`)                                           |
+| Flavors            | `stg` (Staging), `prd` (Production)                                                             |
+| Env / config       | `--dart-define-from-file .env.<flavor>.json` (`.env.stg.json`, `.env.prd.json`)                  |
+| Reference feature  | `lib/features/users` (list, pagination, cache), `lib/features/auth` (login, tokens)             |
+| Localization       | `en`, `uz`, `ru`; ARB template in `lib/core/localization/`; generated `Strings.of(context)!`     |
+| Backend clients    | `DioClient` (primary `BASE_URL`), `DioClientDummyJson` (secondary dummyjson)                    |
+| Functional types   | `dartz` (`Either<Failure, T>`), never `either_dart`                                             |
+| Branch / PR title  | branch `<type>/<ticket-id>_<slug>` → PR title `<type>: <ticket-id> <description>` — see §10    |
+| CI                 | `fvm flutter analyze && fvm flutter test`                                                       |
 
 ---
 
@@ -37,33 +37,53 @@ any project on this stack.
 | Architecture     | Clean Architecture (data / domain / presentation), feature-first                                                              |
 | State management | `flutter_bloc` — **Cubit only**, no `Bloc`/events; `ValueNotifier` for small local UI state, `setState` as a last resort (§7) |
 | DI               | `get_it` service locator, accessed as `sl<T>()`                                                                               |
-| Networking       | `dio` (+ retry and logging/inspector interceptors)                                                                            |
-| Error handling   | `Either<Failure, T>` — no exceptions across layer boundaries                                                                  |
-| Codegen          | `freezed` + `json_serializable` (+ storage/mock generators)                                                                   |
-| Routing          | `go_router`, declarative, all routes in one file                                                                              |
-| Local storage    | key-value boxes behind typed mixins                                                                                           |
+| Networking       | `dio` (+ connection pooling, dynamic `DioInterceptor`, 401 retry)                                                             |
+| Error handling   | `Either<Failure, T>` with semantic failures handled centrally via `DioErrorHandler`                                           |
+| Codegen          | `freezed` + `json_serializable` (+ `hive_ce_generator`)                                                                       |
+| Routing          | `go_router`, declarative, all routes in `lib/core/app_route.dart`                                                              |
+| Local storage    | Hybrid: `FlutterSecureStorage` for secrets (tokens/PIN), `Hive` for prefs/cache (`AppStorageContract`)                        |
 | Responsive UI    | `flutter_screenutil` against a fixed design size                                                                              |
 | i18n             | `flutter gen-l10n` from ARB files                                                                                             |
 
-Entry points: `main.dart` (guarded zone → `serviceLocator()` → `runApp`), the root app widget
-(`MaterialApp.router` + ScreenUtil + global providers), and a global cubit for theme/locale.
+Entry points: `main.dart` (guarded zone → `serviceLocator()` → `FirebaseServices.init()` → `runApp`), the root app widget
+(`MaterialApp.router` + ScreenUtil + global providers), and a global cubit for theme/locale (`MainCubit`).
 
 ---
 
 ## 3. Commands
 
-Use the absolute SDK path if `flutter` is not on `PATH`.
+Use `fvm flutter` / `fvm dart` if FVM is configured.
 
 Bootstrap after clone, after pulling, and after touching any generated source:
 
 ```bash
-flutter pub get && flutter gen-l10n && dart run build_runner build --delete-conflicting-outputs
+fvm flutter pub get && fvm flutter gen-l10n && fvm dart run build_runner build --delete-conflicting-outputs
 ```
 
-Run (add `--flavor <flavor> --dart-define-from-file <env file>` when the project uses flavors):
+Run (Flavors + Env config):
 
 ```bash
-flutter run
+fvm flutter run --flavor stg --dart-define-from-file .env.stg.json
+fvm flutter run --flavor prd --dart-define-from-file .env.prd.json
+```
+
+Generate App Launcher Icons & Native Splash Screens:
+
+```bash
+./scripts/generate_icons_and_splash.sh
+```
+
+Rename project to a new name (Starter Kit setup):
+
+```bash
+./scripts/rename.sh <new_name> <app_id> "<App Title>"
+```
+
+Verify before handing work back:
+
+```bash
+fvm flutter analyze
+fvm flutter test
 ```
 
 Verify before handing work back — match §1's CI commands, at minimum:
@@ -93,15 +113,16 @@ key — otherwise you get a wall of unrelated-looking analyzer errors.
 
 ```
 lib/
-├── main.dart, app.dart, app_cubit.dart
+├── main.dart, app.dart
 ├── core/                       # cross-feature infrastructure, no feature knowledge
 │   ├── api/                    # Dio client(s), interceptors, endpoint constants, isolate parser
-│   ├── error/failure.dart      # ServerFailure, ErrorFailure, NoDataFailure, CacheFailure
+│   ├── bloc/                   # MainCubit (theme, locale)
+│   ├── error/                  # Failure types (Network, Timeout, Server, Unauthorized) + DioErrorHandler
 │   ├── localization/           # ARB files + generated strings
-│   ├── resources/              # Dimens, Palette, Images, themes
+│   ├── resources/              # Dimens, Palette, Images, styles/themes, motion
 │   ├── usecase/usecase.dart    # abstract UseCase<DataType, Params>, NoParams
-│   ├── widgets/                # shared widgets
-│   ├── app_route.dart          # Routes enum + router config
+│   ├── widgets/                # Universal UI kit: Button, TextF, AppErrorView, Empty, PaginatedListView, etc.
+│   ├── app_route.dart          # Routes enum + router config (AppRoute fade transitions)
 │   └── dependencies_injection.dart
 ├── features/<feature>/
 │   ├── data/
@@ -113,7 +134,8 @@ lib/
 │   │   ├── repositories/       # abstract contract
 │   │   └── usecases/           # one class per action
 │   └── pages/                  # UI + cubits
-└── utils/{ext,helper,services} # extensions, helpers, storage, platform services
+└── utils/{ext,helper,services} # extensions, helpers, storage (AppStorageContract), platform services
+scripts/                        # rename.sh, rename_project.py, generate_icons_and_splash.sh
 test/                           # mirrors lib/, plus helpers/ and stubs/
 ```
 
@@ -674,10 +696,24 @@ Widget build(BuildContext context) => Parent(
 
 ## 8. Local storage
 
-Key-value storage sits behind typed mixins, one per logical box (session, cache, in-progress user
-input). Access goes through the DI-registered instance (`sl<MainBoxMixin>()`) or by mixing the box
-into the class that needs it — never the raw box. Keys are enum values or constants, not string
-literals. Adding a persisted custom type means annotating it and re-running codegen.
+Hybrid architecture managed via `AppStorageContract` (`sl<AppStorageContract>()`):
+1. **Secrets / Sensitive Credentials** (`FlutterSecureStorage`): Access Token, Refresh Token, FCM Token, and credentials encrypted in iOS Keychain / Android Keystore.
+2. **Settings, Cache & Preferences** (`Hive`): Theme (`theme`), Locale (`locale`), `isFirstInstall`, `isLogin`.
+
+Keys are strictly typed enums (`PrefKey`, `SecureKey`), never bare string literals.
+
+```dart
+// Access tokens and auth state
+final token = sl<AppStorageContract>().token;
+final isLoggedIn = sl<AppStorageContract>().isLoggedIn;
+
+// Preferences
+final currentLocale = sl<AppStorageContract>().getPref<String>(PrefKey.locale);
+await sl<AppStorageContract>().setPref(PrefKey.locale, 'uz');
+
+// Save tokens securely
+await sl<AppStorageContract>().saveTokens(access: 'token', refresh: 'refresh');
+```
 
 ---
 
@@ -798,5 +834,15 @@ PR title:  feat: yot-123 add new feature
 
 ## 11. Project-specific notes
 
-<Anything true for this repo only: secrets handling, release/distribution scripts, flavor quirks,
-platform setup, feature flags, versioning rules, known-bad areas, committed generated files.>
+- **Environment & Flavors**: The project supports `stg` (Staging) and `prd` (Production) flavors. Configurations are injected at build time using `--dart-define-from-file .env.<flavor>.json`.
+- **Firebase & Google Services**: Multi-flavor setup. Android uses `android/app/src/stg/google-services.json` and `android/app/google-services.json`. iOS uses `ios/config/<flavor>/GoogleService-Info.plist`.
+- **Project Renaming Tool**: Use `./scripts/rename.sh <name> <app_id> "<Title>"` to completely rebrand the starter kit to a new application in seconds.
+- **Assets & Icons**: Use `./scripts/generate_icons_and_splash.sh` to re-generate both `stg` and `prd` launcher icons and native splash screens across Android and iOS.
+- **Universal UI Kit**: Reusable widgets live under `lib/core/widgets/`:
+  - `Button` (`filled`, `outlined`, `text`, `isLoading: true` spinner, icons).
+  - `TextF` (`isPassword: true` for automatic visibility eye toggle).
+  - `AppErrorView` (standard error state with icon, message, and `onRetry` button).
+  - `PaginatedListView<T>` (automatic scroll-to-bottom pagination, pull-to-refresh, empty & loading states).
+- **Error Handling**: Network and Dio exceptions are converted to semantic `Failure` types (`NetworkFailure`, `TimeoutFailure`, `UnauthorizedFailure`, `ServerFailure`, `UnknownFailure`) via `DioErrorHandler.handle(e)`.
+- **Offline / Local Fonts**: Bundled local fonts (`Instrument Sans`) live in `assets/fonts/` for 100% offline reliability.
+

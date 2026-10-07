@@ -31,8 +31,7 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   ActiveTheme getActiveTheme() => ActiveTheme.values.singleWhere(
     (element) =>
-        element.name ==
-        (_storage.getPref<String>(PrefKey.theme) ?? ActiveTheme.system.name),
+        element.name == (_storage.getPref<String>(PrefKey.theme) ?? ActiveTheme.system.name),
   );
 
   DataHelper get _settings => DataHelper(

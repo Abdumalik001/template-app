@@ -34,7 +34,7 @@
               "client_id": "933342696488-ekbqsc1q8pkvk61nj5p0f04061ivr0ug.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.lazycatlabs.auths"
+                "bundle_id": "com.template.app"
               }
             }
           ]
@@ -70,7 +70,7 @@
               "client_id": "933342696488-ekbqsc1q8pkvk61nj5p0f04061ivr0ug.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.lazycatlabs.auths"
+                "bundle_id": "com.template.app"
               }
             }
           ]
@@ -81,7 +81,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:933342696488:android:952e68fef0689db687511d",
         "android_client_info": {
-          "package_name": "com.lazycatlabs.base"
+          "package_name": "com.template.app"
         }
       },
       "oauth_client": [
@@ -106,7 +106,7 @@
               "client_id": "933342696488-ekbqsc1q8pkvk61nj5p0f04061ivr0ug.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.lazycatlabs.auths"
+                "bundle_id": "com.template.app"
               }
             }
           ]
@@ -117,7 +117,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:933342696488:android:009bd6bce9a55acb87511d",
         "android_client_info": {
-          "package_name": "com.lazycatlabs.wautils"
+          "package_name": "com.template.app"
         }
       },
       "oauth_client": [
@@ -125,7 +125,7 @@
           "client_id": "933342696488-i2co7br6pib2js7a8vsjpio4164n0qci.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.lazycatlabs.wautils",
+            "package_name": "com.template.app",
             "certificate_hash": "5cde980e56edd8e9c7396c3a900a0939dcc19681"
           }
         },
@@ -150,7 +150,7 @@
               "client_id": "933342696488-ekbqsc1q8pkvk61nj5p0f04061ivr0ug.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.lazycatlabs.auths"
+                "bundle_id": "com.template.app"
               }
             }
           ]

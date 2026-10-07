@@ -89,7 +89,6 @@ dev_dependencies:
   # Pinned until freezed support latest hive_ce_generator
   hive_ce_generator: 1.11.1
 
-  # TODO: Remove these overrides after packages are updated
   path_provider_platform_interface: ^2.1.3
   mocktail: ^1.0.5
 dependency_overrides:

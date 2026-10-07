@@ -39,7 +39,7 @@ def get_current_facts():
             pkg_name = m.group(1).strip()
 
     # 2. Android ID from build.gradle.kts
-    android_id = "com.lazycatlabs.auth"
+    android_id = "com.template.app"
     gradle_kts = ROOT_DIR / "android" / "app" / "build.gradle.kts"
     if gradle_kts.exists():
         content = gradle_kts.read_text(encoding="utf-8")
@@ -52,7 +52,7 @@ def get_current_facts():
                 android_id = m.group(1).strip()
 
     # 3. iOS Bundle ID from project.pbxproj
-    ios_bundle_id = "com.lazycatlabs.auths"
+    ios_bundle_id = "com.template.app"
     pbxproj = ROOT_DIR / "ios" / "Runner.xcodeproj" / "project.pbxproj"
     if pbxproj.exists():
         content = pbxproj.read_text(encoding="utf-8")
@@ -61,7 +61,7 @@ def get_current_facts():
             ios_bundle_id = m.group(1).strip().replace(".stg", "")
 
     # 4. App title from strings.xml or Info.plist
-    app_title = "Flutter Auth"
+    app_title = "Template App"
     strings_xml = ROOT_DIR / "android" / "app" / "src" / "main" / "res" / "values" / "strings.xml"
     if strings_xml.exists():
         content = strings_xml.read_text(encoding="utf-8")
