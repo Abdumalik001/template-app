@@ -30,7 +30,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 def get_current_facts():
     """Dynamically read current project facts from files."""
     # 1. Package name from pubspec.yaml
-    pkg_name = "cactus_hr"
+    pkg_name = "template_app"
     pubspec = ROOT_DIR / "pubspec.yaml"
     if pubspec.exists():
         content = pubspec.read_text(encoding="utf-8")
