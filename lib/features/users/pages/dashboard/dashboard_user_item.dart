@@ -1,28 +1,14 @@
 part of 'dashboard_page.dart';
 
 class _DashboardUserItem extends StatelessWidget {
-  const _DashboardUserItem({required this.user, this.index});
+  const _DashboardUserItem({required this.user});
 
   final User user;
 
-  /// Position in the list; the first page staggers in, later pages just
-  /// fade so scrolling back never replays a long cascade.
-  final int? index;
-
-  static const _staggeredItems = 10;
-
   @override
-  Widget build(BuildContext context) {
-    final position = index ?? 0;
-
-    return FadeSlideIn(
-      delay: position < _staggeredItems
-          ? Motion.stagger * position
-          : Duration.zero,
-      duration: index == null ? Duration.zero : Motion.slow,
-      child: Padding(
-        padding: EdgeInsets.only(bottom: Dimens.space12),
-        child: AppCard(
+  Widget build(BuildContext context) => Padding(
+    padding: EdgeInsets.only(bottom: Dimens.space12),
+    child: AppCard(
           child: Padding(
             padding: EdgeInsets.all(Dimens.space12),
             child: Row(
@@ -83,7 +69,5 @@ class _DashboardUserItem extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
 }

@@ -23,7 +23,7 @@ class UsersCubit extends Cubit<UsersState> {
     lastPage = 1;
 
     /// fetch data
-    await fetchUsers(UsersParams(page: currentPage));
+    await fetchUsers(UsersParams(page: currentPage), force: true);
   }
 
   Future<void> nextPage() async {
@@ -33,9 +33,21 @@ class UsersCubit extends Cubit<UsersState> {
     }
   }
 
-  Future<void> fetchUsers(UsersParams usersParams) async {
-    if (currentPage == 1) {
+  Future<void> fetchUsers(UsersParams usersParams, {bool force = false}) async {
+    if (currentPage == 1 && users.isEmpty) {
       emit(const UsersStateLoading());
+    } else if (users.isNotEmpty && !force) {
+      // If already loaded and not forced, ensure current state is success
+      emit(
+        UsersStateSuccess(
+          Users(
+            currentPage: currentPage,
+            lastPage: lastPage,
+            users: users,
+          ),
+        ),
+      );
+      return;
     }
 
     final data = await _getUser.call(usersParams);

@@ -69,7 +69,7 @@ void _cubits() {
     ..registerFactory(() => RegisterCubit(sl()))
     ..registerFactory(() => AuthCubit(sl()))
     ..registerFactory(() => LogoutCubit(sl()))
-    ..registerFactory(() => UserCubit(sl()))
-    ..registerFactory(() => UsersCubit(sl()))
+    ..registerLazySingleton(() => UserCubit(sl()))
+    ..registerLazySingleton(() => UsersCubit(sl()))
     ..registerFactory(SettingsCubit.new);
 }

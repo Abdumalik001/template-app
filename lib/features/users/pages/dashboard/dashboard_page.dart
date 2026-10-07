@@ -82,7 +82,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     : ((data.users?.length ?? 0) + 1),
                 padding: EdgeInsets.all(Dimens.space16),
                 itemBuilder: (_, index) => index < (data.users?.length ?? 0)
-                    ? _DashboardUserItem(user: data.users![index], index: index)
+                    ? _DashboardUserItem(user: data.users![index])
                     : Padding(
                         padding: EdgeInsets.all(Dimens.space16),
                         child: Center(
